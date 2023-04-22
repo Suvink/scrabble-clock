@@ -1,20 +1,87 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import * as eva from '@eva-design/eva';
+import { ApplicationProvider, IconRegistry } from '@ui-kitten/components';
+import { EvaIconsPack } from '@ui-kitten/eva-icons';
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import Constants from 'expo-constants'
 
-export default function App() {
+//screens
+import ClockScreen from './screens/ClockScreen';
+import AboutScreen from './screens/AboutScreen';
+import SettingsScreen from './screens/SettingsScreen';
+import HomeScreen from './screens/HomeScreen';
+
+const App = () => {
+
+  const Tab = createBottomTabNavigator();
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <>
+      <IconRegistry icons={EvaIconsPack} />
+      <ApplicationProvider {...eva} theme={eva.light}>
+        <NavigationContainer>
+          <Tab.Navigator
+            initialRouteName="Clock"
+            screenOptions={({ route }) => ({
+              tabBarIcon: ({ focused, color, size }) => {
+                let iconName;
+
+                if (route.name === 'About') {
+                  iconName = focused ? 'information-circle' : 'information-circle-outline';
+                } else if (route.name === 'Clock') {
+                  iconName = focused ? 'time' : 'time-outline';
+                } else if (route.name === 'Settings') {
+                  iconName = focused ? 'settings' : 'settings-outline';
+                }
+                return <Ionicons name={iconName} size={size} color={color} />;
+              },
+              tabBarStyle: { backgroundColor: 'black', borderColor: 'black', activeTintColor: "#ffd63f", borderTopWidth: 0 },
+              headerShown: false,
+            })
+            }
+          >
+            <Tab.Screen
+              name="About"
+              component={AboutScreen}
+              options={{
+                title: "",
+                headerMode: 'none',
+                headerShown: false,
+                tabBarLabel: 'About',
+                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: 'white' },
+                headerStyle: { marginTop: Constants.statusBarHeight }
+              }}
+            />
+            <Tab.Screen
+              name="Clock"
+              component={ClockScreen}
+              options={{
+                title: "",
+                headerShown: false,
+                tabBarLabel: 'Clock',
+                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: 'white' },
+                headerStyle: { marginTop: Constants.statusBarHeight, }
+              }}
+            />
+            <Tab.Screen
+              name="Settings"
+              component={SettingsScreen}
+              options={{
+                title: "",
+                headerShown: false,
+                tabBarLabel: 'Settings',
+                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: 'white' },
+                headerStyle: { marginTop: Constants.statusBarHeight }
+              }}
+            />
+
+          </Tab.Navigator>
+        </NavigationContainer>
+      </ApplicationProvider>
+    </>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
