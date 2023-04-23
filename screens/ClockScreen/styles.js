@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
         justifyItems: "center",
         height: "100%",
         marginTop: Constants.statusBarHeight,
-        backgroundColor: "black"
+        backgroundColor: "#0c1d36"
     },
     settingsBar: {
         display: 'flex',
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#90a4ae',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
+        width: '90%',
         height: "43%",
         borderRadius: 20,
         padding: 20,
@@ -38,10 +38,10 @@ const styles = StyleSheet.create({
     clockActive: {
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#ffd63f',
+        backgroundColor: '#f9cc0b',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
+        width: '90%',
         height: "43%",
         borderRadius: 20,
         padding: 20,

@@ -95,7 +95,7 @@ const SettingsScreen = () => {
     }
 
     return (
-        <PTRView onRefresh={_getSettingsFromStorage} keyboardShouldPersistTaps="handled" style={{height: "100%", backgroundColor: "black"}}>
+        <PTRView onRefresh={_getSettingsFromStorage} keyboardShouldPersistTaps="handled" style={{height: "100%", backgroundColor: "#0c1d36"}}>
             <SafeAreaView style={{ flex: 1, backgroundColor: "black"}}>
                 {!loading ? <Layout style={styles.pageContainer}>
                     <Text category='h1' style={styles.pageTitle}>SETTINGS</Text>
