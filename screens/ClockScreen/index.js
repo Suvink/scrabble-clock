@@ -143,7 +143,6 @@ const ClockScreen = ({ navigation }) => {
         if (bottomTimeEnded) {
             const bottomMins = Math.floor(elapsed / 60);
             const bottomSecs = Math.floor(elapsed % 60);
-            console.log(bottomMins, bottomSecs)
             const _bottomPenalty = (bottomMins * gamePenalty) + (bottomSecs > 0 ? gamePenalty : 0);
 
             if (bottomMins >= gameOvertime) {
