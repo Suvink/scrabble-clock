@@ -6,6 +6,9 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
+        alignContent: "center",
+        justifyItems: "center",
+        height: "100%",
         marginTop: Constants.statusBarHeight,
         backgroundColor: "black"
     },
