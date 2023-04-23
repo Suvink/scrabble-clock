@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
         alignItems: "flex-start",
         marginTop: Constants.statusBarHeight,
-        backgroundColor: "black",
+        backgroundColor: "#0c1d36",
         padding: 30,
         height: "100%"
     },
@@ -40,9 +40,9 @@ const styles = StyleSheet.create({
     settingChangeButton: {
         padding: 0,
         height: 48,
-        backgroundColor: '#ffd63f',
-        color: "black",
-        borderColor: '#ffd63f',
+        backgroundColor: '#f9cc0b',
+        color: "#0c1d36",
+        borderColor: '#f9cc0b',
         
     },
     settingChangeInput: {

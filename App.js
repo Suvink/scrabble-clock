@@ -34,9 +34,9 @@ const App = () => {
                 } else if (route.name === 'Settings') {
                   iconName = focused ? 'settings' : 'settings-outline';
                 }
-                return <Ionicons name={iconName} size={size} color={"#ffd63f"} />;
+                return <Ionicons name={iconName} size={size} color={"#f9cc0b"} />;
               },
-              tabBarStyle: { backgroundColor: 'black', borderColor: 'black', activeTintColor: "#ffd63f", borderTopWidth: 0 },
+              tabBarStyle: { backgroundColor: '#0c1d36', borderColor: '#0c1d36', activeTintColor: "#f9cc0b", borderTopWidth: 0 },
               headerShown: false,
             })
             }
@@ -49,7 +49,7 @@ const App = () => {
                 headerMode: 'none',
                 headerShown: false,
                 tabBarLabel: 'About',
-                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: '#ffd63f' },
+                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: '#f9cc0b' },
                 headerStyle: { marginTop: Constants.statusBarHeight }
               }}
             />
@@ -60,7 +60,7 @@ const App = () => {
                 title: "",
                 headerShown: false,
                 tabBarLabel: 'Clock',
-                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: '#ffd63f' },
+                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: '#f9cc0b' },
                 headerStyle: { marginTop: Constants.statusBarHeight, }
               }}
             />
@@ -71,7 +71,7 @@ const App = () => {
                 title: "",
                 headerShown: false,
                 tabBarLabel: 'Settings',
-                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: '#ffd63f' },
+                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: '#f9cc0b' },
                 headerStyle: { marginTop: Constants.statusBarHeight }
               }}
             />
