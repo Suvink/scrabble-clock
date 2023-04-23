@@ -5,16 +5,21 @@ import styles from './styles';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { StatusBar } from 'expo-status-bar';
 import CountDown from 'react-native-countdown-component';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ClockScreen = () => {
+const ClockScreen = ({ navigation }) => {
 
     const [clockTopRunning, setClockTopRunning] = useState(false);
     const [clockBottomRunning, setClockBottomRunning] = useState(false);
     const [isGamePaused, setIsGamePaused] = useState(true);
     const [isGameStarted, setIsGameStarted] = useState(false);
-    const [clockTime, setClockTime] = useState(30);
     const [resetModalVisible, setResetModalVisible] = useState(false);
     const [runningTaskByPause, setRunningTaskByPause] = useState("");
+
+    //Game settings
+    const [gameTime, setGameTime] = useState(13);
+    const [gameOvertime, setGameOvertime] = useState(5);
+    const [gamePenalty, setGamePenalty] = useState(2);
 
     //Reset Params
     const [topClockId, setTopClockId] = useState("100");
@@ -23,6 +28,16 @@ const ClockScreen = () => {
     //penalty
     const [topPenalty, setTopPenalty] = useState(0);
     const [bottomPenalty, setBottomPenalty] = useState(0);
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            console.log("fetching")
+            getSettings();
+            console.log("state", gameTime, gameOvertime, gamePenalty)
+        });
+
+        return unsubscribe;
+    }, [navigation]);
 
     const handlePlayPause = () => {
         if (!isGameStarted) {
@@ -67,19 +82,43 @@ const ClockScreen = () => {
     const resetGame = () => {
         setClockTopRunning(false);
         setClockBottomRunning(false);
-        setClockTime(30);
         setBottomClockId(Math.random().toString());
         setTopClockId(Math.random().toString());
         setResetModalVisible(false);
     }
 
+    const getSettings = async () => {
+        try {
+            const time = await AsyncStorage.getItem('@time');
+            const overtime = await AsyncStorage.getItem('@overtime');
+            const penalty = await AsyncStorage.getItem('@penalty');
+
+            if (time !== null) {
+                setGameTime(parseInt(time));
+            }
+            if (overtime !== null) {
+                setGameOvertime(parseInt(overtime));
+            }
+            if (penalty !== null) {
+                setGamePenalty(parseInt(penalty));
+            }
+
+            console.log("store", time, overtime, penalty)
+
+        } catch (error) {
+            console.log(error);
+            alert("Could not load settings :(");
+        }
+    }
+
+
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
             <Layout style={styles.pageContainer}>
                 <Pressable style={clockTopRunning ? styles.clockActive : styles.clockView} onPress={handleTopTap}>
                     <View style={clockTopRunning ? styles.clockActive : styles.clockView}>
-                        <CountDown
-                            until={clockTime}
+                        {(gameTime && gameOvertime && gamePenalty) && <CountDown
+                            until={25}
                             onFinish={() => alert('finished')}
                             timeToShow={['M', 'S']}
                             size={80}
@@ -89,9 +128,10 @@ const ClockScreen = () => {
                             showSeparator={true}
                             separatorStyle={{ padding: 0, margin: 0 }}
                             running={clockTopRunning}
-                            id={topClockId}
-                        />
+                            id={topClockId || 456}
+                        />}
                         {topPenalty > 0 && <Text category='h1'>Penalty: {topPenalty}</Text>}
+                        <Text category='h1'>Time: {gameTime}</Text>
                     </View>
                 </Pressable>
                 <View style={styles.settingsBar}>
@@ -109,7 +149,7 @@ const ClockScreen = () => {
                 <Pressable style={clockBottomRunning ? styles.clockActive : styles.clockView} onPress={handleBottomTap}>
                     <View style={clockBottomRunning ? styles.clockActive : styles.clockView}>
                         <CountDown
-                            until={clockTime}
+                            until={25}
                             onFinish={() => alert('finished')}
                             timeToShow={['M', 'S']}
                             size={80}
@@ -119,7 +159,7 @@ const ClockScreen = () => {
                             showSeparator={true}
                             separatorStyle={{ padding: 0, margin: 0 }}
                             running={clockBottomRunning}
-                            id={bottomClockId}
+                            id={bottomClockId || 123}
                         />
                         {bottomPenalty > 0 && <Text category='h1'>Penalty: {bottomPenalty}</Text>}
                     </View>

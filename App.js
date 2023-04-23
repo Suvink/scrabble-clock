@@ -11,7 +11,6 @@ import Constants from 'expo-constants'
 import ClockScreen from './screens/ClockScreen';
 import AboutScreen from './screens/AboutScreen';
 import SettingsScreen from './screens/SettingsScreen';
-import HomeScreen from './screens/HomeScreen';
 
 const App = () => {
 
@@ -35,7 +34,7 @@ const App = () => {
                 } else if (route.name === 'Settings') {
                   iconName = focused ? 'settings' : 'settings-outline';
                 }
-                return <Ionicons name={iconName} size={size} color={color} />;
+                return <Ionicons name={iconName} size={size} color={"#ffd63f"} />;
               },
               tabBarStyle: { backgroundColor: 'black', borderColor: 'black', activeTintColor: "#ffd63f", borderTopWidth: 0 },
               headerShown: false,
@@ -50,7 +49,7 @@ const App = () => {
                 headerMode: 'none',
                 headerShown: false,
                 tabBarLabel: 'About',
-                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: 'white' },
+                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: '#ffd63f' },
                 headerStyle: { marginTop: Constants.statusBarHeight }
               }}
             />
@@ -61,7 +60,7 @@ const App = () => {
                 title: "",
                 headerShown: false,
                 tabBarLabel: 'Clock',
-                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: 'white' },
+                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: '#ffd63f' },
                 headerStyle: { marginTop: Constants.statusBarHeight, }
               }}
             />
@@ -72,7 +71,7 @@ const App = () => {
                 title: "",
                 headerShown: false,
                 tabBarLabel: 'Settings',
-                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: 'white' },
+                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: '#ffd63f' },
                 headerStyle: { marginTop: Constants.statusBarHeight }
               }}
             />

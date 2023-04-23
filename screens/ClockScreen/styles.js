@@ -4,8 +4,8 @@ import Constants from 'expo-constants'
 const styles = StyleSheet.create({
     pageContainer: {
         flex: 1,
-        justifyContent: "flex-start",
-        alignItems: "flex-start",
+        justifyContent: "center",
+        alignItems: "center",
         marginTop: Constants.statusBarHeight,
         backgroundColor: "black"
     },
