@@ -46,6 +46,17 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: 20,
     },
+    clockActivePenalty: {
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#f90b42',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '90%',
+        height: "43%",
+        borderRadius: 20,
+        padding: 20,
+    },
     settingsButton: {
         marginLeft: 25,
         marginRight: 25,

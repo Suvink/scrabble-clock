@@ -174,8 +174,8 @@ class CountDown extends React.Component {
                     this.state.isReverse ?
                         <Text style={[
                             styles.digitTxt,
-                            digitTxtStyle,
                             { fontSize: 100 },
+                            digitTxtStyle,
                         ]}>
                             {d}
                         </Text> :
@@ -259,7 +259,7 @@ class CountDown extends React.Component {
                 style={styles.timeCont}
                 onPress={this.props.onPress}
             >
-                {this.state.isReverse ? this.renderMinusSeparator() : null}
+                {/* {this.state.isReverse ? this.renderMinusSeparator() : null} */}
                 {timeToShow.includes('H') ? this.renderDoubleDigits(timeLabels.h, newTime[1]) : null}
                 {showSeparator && timeToShow.includes('H') && timeToShow.includes('M') ? this.renderSeparator() : null}
                 {timeToShow.includes('M') ? this.renderDoubleDigits(timeLabels.m, newTime[2]) : null}
