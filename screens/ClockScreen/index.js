@@ -67,6 +67,30 @@ const ClockScreen = ({ navigation }) => {
         }
     }
 
+    const handleBackgroundState = (state) => {
+        console.log(state)
+        //user leaves the game
+        if (state === "pause") {
+            if (isGameStarted && !isGamePaused) {
+                setClockTopRunning(false);
+                setClockBottomRunning(false);
+                setIsGamePaused(true);
+                const runningClock = clockTopRunning ? "top" : "bottom";
+                setRunningTaskByPause(runningClock);
+            }
+            //User comes back to the game
+        } else {
+            if (isGameStarted && isGamePaused) {
+                if (runningTaskByPause == "top") {
+                    setClockTopRunning(true);
+                } else {
+                    setClockBottomRunning(true);
+                }
+                setIsGamePaused(false);
+            }
+        }
+    }
+
     const handleBottomTap = () => {
         if (isGameStarted && !isGamePaused) {
             setClockBottomRunning(false);
@@ -183,6 +207,7 @@ const ClockScreen = ({ navigation }) => {
                                 running={clockTopRunning}
                                 id={topClockId || 456}
                                 onChange={handleTopPenalty}
+                                onAppBackground={handleBackgroundState}
                             />}
                             {topTimeEnded && <Text category='h2'>{topPenalty}</Text>}
                         </View>
@@ -226,6 +251,7 @@ const ClockScreen = ({ navigation }) => {
                                 running={clockBottomRunning}
                                 id={bottomClockId || 123}
                                 onChange={handleBottomPenalty}
+                                onAppBackground={handleBackgroundState}
                             />
                             {bottomTimeEnded && <Text category='h2'>{bottomPenalty}</Text>}
                         </View>

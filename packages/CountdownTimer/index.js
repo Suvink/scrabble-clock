@@ -37,6 +37,7 @@ class CountDown extends React.Component {
         onChange: PropTypes.func,
         onPress: PropTypes.func,
         onFinish: PropTypes.func,
+        onAppBackground: PropTypes.func
     };
 
     state = {
@@ -81,15 +82,24 @@ class CountDown extends React.Component {
 
     _handleAppStateChange = currentAppState => {
         const { until, wentBackgroundAt } = this.state;
-        if (currentAppState === 'active' && wentBackgroundAt && this.props.running) {
-            const diff = (Date.now() - wentBackgroundAt) / 1000.0;
-            this.setState({
-                lastUntil: until,
-                until: Math.max(0, until - diff)
-            });
+        if (currentAppState === 'active' && wentBackgroundAt && this.props.running) { //User comes from the background
+            if (this.props.onAppBackground !== undefined) {
+                this.props.onAppBackground("resume");
+            }
+            else {
+                //If the user does not have provided a background function, let the timer run by default
+                const diff = (Date.now() - wentBackgroundAt) / 1000.0;
+                this.setState({
+                    lastUntil: until,
+                    until: Math.max(0, until - diff)
+                });
+            }
         }
-        if (currentAppState === 'background') {
+        if (currentAppState === 'background') { //user went background
             this.setState({ wentBackgroundAt: Date.now() });
+            if (this.props.onAppBackground !== undefined) {
+                this.props.onAppBackground("pause");
+            }
         }
     }
 

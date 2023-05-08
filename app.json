@@ -25,7 +25,8 @@
       "androidStatusBar": {
         "backgroundColor": "#0c1d36",
         "translucent": false
-      }
+      },
+      "package": "com.suvink.scrabble_o_clock"
     },
     "web": {
       "favicon": "./assets/favicon.png"
