@@ -195,7 +195,7 @@ const ClockScreen = ({ navigation }) => {
                             }
                         >
                             {(gameTime && gameOvertime && gamePenalty) && <CountDown
-                                until={gameTime}
+                                until={gameTime * 60}
                                 onFinish={() => setTopTimeEnded(true)}
                                 timeToShow={['M', 'S']}
                                 size={80}
@@ -239,7 +239,7 @@ const ClockScreen = ({ navigation }) => {
                             }
                         >
                             <CountDown
-                                until={gameTime}
+                                until={gameTime * 60}
                                 onFinish={() => setBottomTimeEnded(true)}
                                 timeToShow={['M', 'S']}
                                 size={80}
