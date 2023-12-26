@@ -33,6 +33,39 @@ const ClockScreen = ({ navigation }) => {
     const [topTimeEnded, setTopTimeEnded] = useState(false);
     const [bottomTimeEnded, setBottomTimeEnded] = useState(false);
 
+    const getSettings = async () => {
+        try {
+            const time = await AsyncStorage.getItem('@time');
+            const overtime = await AsyncStorage.getItem('@overtime');
+            const penalty = await AsyncStorage.getItem('@penalty');
+
+            if (time !== null) {
+                setGameTime(parseInt(time));
+            }
+            if (overtime !== null) {
+                setGameOvertime(parseInt(overtime));
+            }
+            if (penalty !== null) {
+                setGamePenalty(parseInt(penalty));
+            }
+
+            //Reset the timer UIs
+            setClockTopRunning(false);
+            setClockBottomRunning(false);
+            setIsGamePaused(true);
+            setBottomClockId(Math.random().toString());
+            setTopClockId(Math.random().toString());
+
+        } catch (error) {
+            console.log(error);
+            alert("Could not load settings :(");
+        }
+    }
+
+    useEffect(() => {
+        getSettings();
+    }, []);
+
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             getSettings();
@@ -68,7 +101,6 @@ const ClockScreen = ({ navigation }) => {
     }
 
     const handleBackgroundState = (state) => {
-        console.log(state)
         //user leaves the game
         if (state === "pause") {
             if (isGameStarted && !isGamePaused) {
@@ -118,35 +150,6 @@ const ClockScreen = ({ navigation }) => {
         setBottomPenalty("0");
         setResetModalVisible(false);
 
-    }
-
-    const getSettings = async () => {
-        try {
-            const time = await AsyncStorage.getItem('@time');
-            const overtime = await AsyncStorage.getItem('@overtime');
-            const penalty = await AsyncStorage.getItem('@penalty');
-
-            if (time !== null) {
-                setGameTime(parseInt(time));
-            }
-            if (overtime !== null) {
-                setGameOvertime(parseInt(overtime));
-            }
-            if (penalty !== null) {
-                setGamePenalty(parseInt(penalty));
-            }
-
-            //Reset the timer UIs
-            setClockTopRunning(false);
-            setClockBottomRunning(false);
-            setIsGamePaused(true);
-            setBottomClockId(Math.random().toString());
-            setTopClockId(Math.random().toString());
-
-        } catch (error) {
-            console.log(error);
-            alert("Could not load settings :(");
-        }
     }
 
     const handleTopPenalty = (elapsed) => {
@@ -228,6 +231,7 @@ const ClockScreen = ({ navigation }) => {
                                 id={topClockId || 456}
                                 onChange={handleTopPenalty}
                                 onAppBackground={handleBackgroundState}
+                                isGameStarted={isGameStarted}
                             />}
                             {topTimeEnded && <Text category='h2'>{topPenalty}</Text>}
                         </View>
@@ -272,6 +276,7 @@ const ClockScreen = ({ navigation }) => {
                                 id={bottomClockId || 123}
                                 onChange={handleBottomPenalty}
                                 onAppBackground={handleBackgroundState}
+                                isGameStarted={isGameStarted}
                             />
                             {bottomTimeEnded && <Text category='h2'>{bottomPenalty}</Text>}
                         </View>
