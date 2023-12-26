@@ -177,6 +177,27 @@ const ClockScreen = ({ navigation }) => {
         }
     }
 
+    const getTopClockStyles = () => {
+        if (topTimeEnded) {
+            return {
+                ...styles.topClockComponent,
+                ...styles.clockActivePenalty
+            };
+        } else {
+            if (clockTopRunning) {
+                return {
+                    ...styles.topClockComponent,
+                    ...styles.clockActive
+                };
+            } else {
+                return {
+                    ...styles.topClockComponent,
+                    ...styles.clockView
+                };
+            }
+        }
+    }
+
 
     return (
         <PTRView onRefresh={getSettings} style={{ height: "100%", backgroundColor: "#0c1d36" }}>
@@ -190,8 +211,7 @@ const ClockScreen = ({ navigation }) => {
                         onPress={handleTopTap}>
                         <View
                             style={
-                                topTimeEnded ? styles.clockActivePenalty
-                                    : (clockTopRunning ? styles.clockActive : styles.clockView)
+                                getTopClockStyles()
                             }
                         >
                             {(gameTime && gameOvertime && gamePenalty) && <CountDown
