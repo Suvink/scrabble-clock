@@ -33,6 +33,39 @@ const ClockScreen = ({ navigation }) => {
     const [topTimeEnded, setTopTimeEnded] = useState(false);
     const [bottomTimeEnded, setBottomTimeEnded] = useState(false);
 
+    const getSettings = async () => {
+        try {
+            const time = await AsyncStorage.getItem('@time');
+            const overtime = await AsyncStorage.getItem('@overtime');
+            const penalty = await AsyncStorage.getItem('@penalty');
+
+            if (time !== null) {
+                setGameTime(parseInt(time));
+            }
+            if (overtime !== null) {
+                setGameOvertime(parseInt(overtime));
+            }
+            if (penalty !== null) {
+                setGamePenalty(parseInt(penalty));
+            }
+
+            //Reset the timer UIs
+            setClockTopRunning(false);
+            setClockBottomRunning(false);
+            setIsGamePaused(true);
+            setBottomClockId(Math.random().toString());
+            setTopClockId(Math.random().toString());
+
+        } catch (error) {
+            console.log(error);
+            alert("Could not load settings :(");
+        }
+    }
+
+    useEffect(() => {
+        getSettings();
+    }, []);
+
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             getSettings();
@@ -68,7 +101,6 @@ const ClockScreen = ({ navigation }) => {
     }
 
     const handleBackgroundState = (state) => {
-        console.log(state)
         //user leaves the game
         if (state === "pause") {
             if (isGameStarted && !isGamePaused) {
@@ -120,35 +152,6 @@ const ClockScreen = ({ navigation }) => {
 
     }
 
-    const getSettings = async () => {
-        try {
-            const time = await AsyncStorage.getItem('@time');
-            const overtime = await AsyncStorage.getItem('@overtime');
-            const penalty = await AsyncStorage.getItem('@penalty');
-
-            if (time !== null) {
-                setGameTime(parseInt(time));
-            }
-            if (overtime !== null) {
-                setGameOvertime(parseInt(overtime));
-            }
-            if (penalty !== null) {
-                setGamePenalty(parseInt(penalty));
-            }
-
-            //Reset the timer UIs
-            setClockTopRunning(false);
-            setClockBottomRunning(false);
-            setIsGamePaused(true);
-            setBottomClockId(Math.random().toString());
-            setTopClockId(Math.random().toString());
-
-        } catch (error) {
-            console.log(error);
-            alert("Could not load settings :(");
-        }
-    }
-
     const handleTopPenalty = (elapsed) => {
         if (topTimeEnded) {
             const topMins = Math.floor(elapsed / 60);
@@ -177,6 +180,27 @@ const ClockScreen = ({ navigation }) => {
         }
     }
 
+    const getTopClockStyles = () => {
+        if (topTimeEnded) {
+            return {
+                ...styles.topClockComponent,
+                ...styles.clockActivePenalty
+            };
+        } else {
+            if (clockTopRunning) {
+                return {
+                    ...styles.topClockComponent,
+                    ...styles.clockActive
+                };
+            } else {
+                return {
+                    ...styles.topClockComponent,
+                    ...styles.clockView
+                };
+            }
+        }
+    }
+
 
     return (
         <PTRView onRefresh={getSettings} style={{ height: "100%", backgroundColor: "#0c1d36" }}>
@@ -190,8 +214,7 @@ const ClockScreen = ({ navigation }) => {
                         onPress={handleTopTap}>
                         <View
                             style={
-                                topTimeEnded ? styles.clockActivePenalty
-                                    : (clockTopRunning ? styles.clockActive : styles.clockView)
+                                getTopClockStyles()
                             }
                         >
                             {(gameTime && gameOvertime && gamePenalty) && <CountDown
@@ -208,6 +231,7 @@ const ClockScreen = ({ navigation }) => {
                                 id={topClockId || 456}
                                 onChange={handleTopPenalty}
                                 onAppBackground={handleBackgroundState}
+                                isGameStarted={isGameStarted}
                             />}
                             {topTimeEnded && <Text category='h2'>{topPenalty}</Text>}
                         </View>
@@ -252,6 +276,7 @@ const ClockScreen = ({ navigation }) => {
                                 id={bottomClockId || 123}
                                 onChange={handleBottomPenalty}
                                 onAppBackground={handleBackgroundState}
+                                isGameStarted={isGameStarted}
                             />
                             {bottomTimeEnded && <Text category='h2'>{bottomPenalty}</Text>}
                         </View>

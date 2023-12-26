@@ -32,6 +32,7 @@ class CountDown extends React.Component {
         separatorStyle: PropTypes.object,
         timeToShow: PropTypes.array,
         showSeparator: PropTypes.bool,
+        isGameStarted: PropTypes.bool,
         size: PropTypes.number,
         until: PropTypes.number,
         onChange: PropTypes.func,
@@ -115,9 +116,9 @@ class CountDown extends React.Component {
 
     updateTimer = () => {
         if (!this.state.isReverse) {
-            if (this.state.lastUntil === this.state.until || !this.props.running) {
-                return;
-            }
+            if (!this.props.running) return;
+            if (this.state.isGameStarted && (this.state.lastUntil === this.state.until)) return;
+
             if (this.state.until === 1 || (this.state.until === 0 && this.state.lastUntil !== 1)) {
                 if (this.props.onFinish) {
                     this.setState({ isReverse: true });

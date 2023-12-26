@@ -3,9 +3,6 @@ import CountDown from 'react-native-countdown-component';
 
 const Clock = ({ time, running, id }) => {
 
-    useEffect(() => {
-        console.log("clock rerendered", id , time, running)
-    },[time])
     return (
         <CountDown
             until={time}
