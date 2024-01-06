@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { View, SafeAreaView, Keyboard } from 'react-native';
-import { Layout, Text, Button, Divider, Input } from '@ui-kitten/components';
+import { Layout, Text, Button, Divider, Input, Toggle } from '@ui-kitten/components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './styles';
 import LoadingIndicator from "../../common/LoadingIndicator";
 import PTRView from "react-native-pull-to-refresh";
+import {
+    DEFAULT_TIME,
+    DEFAULT_OVERTIME,
+    DEFAULT_PENALTY,
+    DEFAULT_OPPOSITE_DIRECTION,
+    DEFAULT_HAPTICS_ENABLED
+} from '../../utils/constants';
+import { toBool } from "../../utils/utils";
 
 const SettingsScreen = () => {
 
@@ -12,6 +20,8 @@ const SettingsScreen = () => {
     const [overtime, setOvertime] = useState(0);
     const [penalty, setPenalty] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [isOppositeDirectionCards, setIsOppositeDirectionCards] = useState(true);
+    const [isHapticsEnabled, setIsHapticsEnabled] = useState(true);
 
     useEffect(() => {
         _getSettingsFromStorage();
@@ -19,38 +29,33 @@ const SettingsScreen = () => {
 
     const _getSettingsFromStorage = async () => {
         try {
-            const time = await AsyncStorage.getItem('@time');
-            const overtime = await AsyncStorage.getItem('@overtime');
-            const penalty = await AsyncStorage.getItem('@penalty');
+            const [time, overtime, penalty, isOppositeDirectionCards, isHapticsEnabled] = await Promise.all([
+                AsyncStorage.getItem('@time'),
+                AsyncStorage.getItem('@overtime'),
+                AsyncStorage.getItem('@penalty'),
+                AsyncStorage.getItem('@isOppositeDirectionCards'),
+                AsyncStorage.getItem('@isHapticsEnabled'),
+            ]);
 
-            if (time === null) {
-                _setDefaultsFirstTime('@time', 25);
-                setTime(25);
-            } else {
-                setTime(time);
-            }
+            time === null && _setDefaultsFirstTime('@time', DEFAULT_TIME);
+            overtime === null && _setDefaultsFirstTime('@overtime', DEFAULT_OVERTIME);
+            penalty === null && _setDefaultsFirstTime('@penalty', DEFAULT_PENALTY);
+            isOppositeDirectionCards === null && _setDefaultsFirstTime('@isOppositeDirectionCards', DEFAULT_OPPOSITE_DIRECTION);
+            isHapticsEnabled === null && _setDefaultsFirstTime('@isHapticsEnabled', DEFAULT_HAPTICS_ENABLED);
 
-            if (overtime === null) {
-                _setDefaultsFirstTime('@overtime', 5);
-                setOvertime(5);
-            } else {
-                setOvertime(overtime);
-            }
+            setTime(time || DEFAULT_TIME);
+            setOvertime(overtime || DEFAULT_OVERTIME);
+            setPenalty(penalty || DEFAULT_PENALTY);
+            setIsOppositeDirectionCards(isOppositeDirectionCards === null ? DEFAULT_OPPOSITE_DIRECTION : toBool(isOppositeDirectionCards));
+            setIsHapticsEnabled(isHapticsEnabled === null ? DEFAULT_HAPTICS_ENABLED : toBool(isHapticsEnabled));
 
-            if (penalty === null) {
-                _setDefaultsFirstTime('@penalty', 2);
-                setPenalty(2);
-            } else {
-                setPenalty(penalty);
-            }
-
-            setLoading(false)
+            setLoading(false);
         } catch (error) {
             console.log(error);
             alert("Could not load settings :(");
             setLoading(false);
         }
-    }
+    };
 
     const _setDefaultsFirstTime = async (key, value) => {
         Keyboard.dismiss();
@@ -92,6 +97,35 @@ const SettingsScreen = () => {
                 alert("Could not save penalty time :(")
             }
         }
+    }
+
+    const _setTimerDirections = async (status) => {
+        try {
+            await AsyncStorage.setItem('@isOppositeDirectionCards', status.toString());
+            alert("Successfully saved :)")
+        } catch (error) {
+            alert("Could not save timer direction :(")
+        }
+    }
+
+    const _setHapticsSettings = async (status) => {
+        try {
+            await AsyncStorage.setItem('@isHapticsEnabled', status.toString());
+            alert("Successfully saved :)")
+        } catch (error) {
+            alert("Could not save haptics settings :(")
+        }
+    }
+
+    const applyTimerDirectionSettings = (isChecked) => {
+        setIsOppositeDirectionCards(isChecked);
+        _setTimerDirections(isChecked);
+    }
+
+    const applyHapticsSettings = (isChecked) => {
+        console.log(isChecked);
+        setIsHapticsEnabled(isChecked);
+        _setHapticsSettings(isChecked);
     }
 
     return (
@@ -164,6 +198,39 @@ const SettingsScreen = () => {
                             </View>
                             <View style={styles.changeSettingRight}>
                                 <Button size='small' style={styles.settingChangeButton} onPress={_setPenaltyTime}> Save </Button>
+                            </View>
+                        </View>
+                        <Divider style={styles.divider} />
+                    </View>
+                    <View>
+                        <View style={styles.settingContainer}>
+                            <Text category='h4' style={styles.settingTitle}>Personalization</Text>
+                            <Text category='h6' style={styles.settingSubtitle}>Customize the UI</Text>
+                        </View>
+                        <View style={styles.changeSettingContainer}>
+                            <View style={styles.changeSettingLeft}>
+                                <Text category='h5' style={styles.personalizationSettingsText}>Timers facing opposite direction</Text>
+                            </View>
+                            <View style={styles.changeSettingRight}>
+                                <Toggle
+                                    size='small'
+                                    status='warning'
+                                    checked={isOppositeDirectionCards}
+                                    onChange={applyTimerDirectionSettings}
+                                />
+                            </View>
+                        </View>
+                        <View style={styles.changeSettingContainer}>
+                            <View style={styles.changeSettingLeft}>
+                                <Text category='h5' style={styles.personalizationSettingsText}>Haptics</Text>
+                            </View>
+                            <View style={styles.changeSettingRight}>
+                                <Toggle
+                                    size='small'
+                                    status='warning'
+                                    checked={isHapticsEnabled}
+                                    onChange={applyHapticsSettings}
+                                />
                             </View>
                         </View>
                         <Divider style={styles.divider} />

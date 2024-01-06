@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginLeft: 10,
     },
-    topClockComponent: {
+    topClockInverse: {
         transform: "rotate(180deg)"
     }
 });

@@ -8,7 +8,12 @@ import CountDown from '../../packages/CountdownTimer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PTRView from "react-native-pull-to-refresh";
 import * as Haptics from 'expo-haptics';
-
+import { 
+    DEFAULT_TIME, 
+    DEFAULT_OVERTIME, 
+    DEFAULT_PENALTY, 
+    DEFAULT_OPPOSITE_DIRECTION, 
+    DEFAULT_HAPTICS_ENABLED } from '../../utils/constants';
 
 const ClockScreen = ({ navigation }) => {
 
@@ -18,6 +23,8 @@ const ClockScreen = ({ navigation }) => {
     const [isGameStarted, setIsGameStarted] = useState(false);
     const [resetModalVisible, setResetModalVisible] = useState(false);
     const [runningTaskByPause, setRunningTaskByPause] = useState("");
+    const [isOppositeDirectionCards, setIsOppositeDirectionCards] = useState(true);
+    const [isHapticsEnabled, setIsHapticsEnabled] = useState(true);
 
     //Game settings
     const [gameTime, setGameTime] = useState(13);
@@ -36,32 +43,26 @@ const ClockScreen = ({ navigation }) => {
 
     const getSettings = async () => {
         try {
-            const time = await AsyncStorage.getItem('@time');
-            const overtime = await AsyncStorage.getItem('@overtime');
-            const penalty = await AsyncStorage.getItem('@penalty');
+            const keys = ['@time', '@overtime', '@penalty', '@isOppositeDirectionCards', '@isHapticsEnabled'];
+            const [time, overtime, penalty, oppositeCardDirection, hapticsEnabled] = await AsyncStorage.multiGet(keys);
+            setGameTime(time ? parseInt(time[1]) : DEFAULT_TIME);
+            setGameOvertime(overtime ? parseInt(overtime[1]) : DEFAULT_OVERTIME);
+            setGamePenalty(penalty ? parseInt(penalty[1]) : DEFAULT_PENALTY);
+            setIsOppositeDirectionCards(oppositeCardDirection ? oppositeCardDirection[1] === "true" : DEFAULT_OPPOSITE_DIRECTION);
+            setIsHapticsEnabled(hapticsEnabled ? hapticsEnabled[1] === "true" : DEFAULT_HAPTICS_ENABLED);
 
-            if (time !== null) {
-                setGameTime(parseInt(time));
-            }
-            if (overtime !== null) {
-                setGameOvertime(parseInt(overtime));
-            }
-            if (penalty !== null) {
-                setGamePenalty(parseInt(penalty));
-            }
-
-            //Reset the timer UIs
+            // Reset the timer UIs
             setClockTopRunning(false);
             setClockBottomRunning(false);
             setIsGamePaused(true);
             setBottomClockId(Math.random().toString());
             setTopClockId(Math.random().toString());
-
         } catch (error) {
             console.log(error);
             alert("Could not load settings :(");
         }
-    }
+    };
+
 
     useEffect(() => {
         getSettings();
@@ -76,7 +77,7 @@ const ClockScreen = ({ navigation }) => {
     }, [navigation]);
 
     const handlePlayPause = () => {
-        Haptics.notificationAsync(
+        isHapticsEnabled && Haptics.notificationAsync(
             Haptics.NotificationFeedbackType.Warning
         );
         if (!isGameStarted) {
@@ -128,7 +129,7 @@ const ClockScreen = ({ navigation }) => {
     }
 
     const handleBottomTap = () => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        isHapticsEnabled && Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         if (isGameStarted && !isGamePaused) {
             setClockBottomRunning(false);
             setClockTopRunning(true);
@@ -136,7 +137,7 @@ const ClockScreen = ({ navigation }) => {
     }
 
     const handleTopTap = () => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        isHapticsEnabled && Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         if (isGameStarted && !isGamePaused) {
             setClockTopRunning(false);
             setClockBottomRunning(true);
@@ -187,25 +188,11 @@ const ClockScreen = ({ navigation }) => {
     }
 
     const getTopClockStyles = () => {
-        if (topTimeEnded) {
-            return {
-                ...styles.topClockComponent,
-                ...styles.clockActivePenalty
-            };
-        } else {
-            if (clockTopRunning) {
-                return {
-                    ...styles.topClockComponent,
-                    ...styles.clockActive
-                };
-            } else {
-                return {
-                    ...styles.topClockComponent,
-                    ...styles.clockView
-                };
-            }
-        }
-    }
+        const isActive = topTimeEnded || clockTopRunning;
+        const baseStyles = isOppositeDirectionCards ? styles.topClockInverse : {};
+
+        return isActive ? { ...baseStyles, ...styles.clockActive } : { ...baseStyles, ...styles.clockView };
+    };
 
 
     return (

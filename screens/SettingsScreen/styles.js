@@ -31,7 +31,8 @@ const styles = StyleSheet.create({
         marginBottom: 20
     },
     changeSettingLeft: {
-        width: "70%"
+        width: "70%",
+        alignSelf: "center",
     },
     changeSettingRight: {
         width: "30%",
@@ -51,6 +52,10 @@ const styles = StyleSheet.create({
     divider:{
         backgroundColor: "white",
         alignSelf: "stretch"
+    },
+    personalizationSettingsText: {
+        color: "white",
+        fontSize: 15
     }
     
 });
