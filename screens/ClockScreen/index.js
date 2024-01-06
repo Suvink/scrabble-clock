@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import CountDown from '../../packages/CountdownTimer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PTRView from "react-native-pull-to-refresh";
+import * as Haptics from 'expo-haptics';
 
 
 const ClockScreen = ({ navigation }) => {
@@ -75,6 +76,9 @@ const ClockScreen = ({ navigation }) => {
     }, [navigation]);
 
     const handlePlayPause = () => {
+        Haptics.notificationAsync(
+            Haptics.NotificationFeedbackType.Warning
+        );
         if (!isGameStarted) {
             setIsGamePaused(false);
             setIsGameStarted(true);
@@ -124,6 +128,7 @@ const ClockScreen = ({ navigation }) => {
     }
 
     const handleBottomTap = () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         if (isGameStarted && !isGamePaused) {
             setClockBottomRunning(false);
             setClockTopRunning(true);
@@ -131,6 +136,7 @@ const ClockScreen = ({ navigation }) => {
     }
 
     const handleTopTap = () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         if (isGameStarted && !isGamePaused) {
             setClockTopRunning(false);
             setClockBottomRunning(true);
