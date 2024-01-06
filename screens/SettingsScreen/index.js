@@ -5,6 +5,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './styles';
 import LoadingIndicator from "../../common/LoadingIndicator";
 import PTRView from "react-native-pull-to-refresh";
+import {
+    DEFAULT_TIME,
+    DEFAULT_OVERTIME,
+    DEFAULT_PENALTY,
+    DEFAULT_OPPOSITE_DIRECTION,
+    DEFAULT_HAPTICS_ENABLED
+} from '../../utils/constants';
+import { toBool } from "../../utils/utils";
 
 const SettingsScreen = () => {
 
@@ -29,18 +37,18 @@ const SettingsScreen = () => {
                 AsyncStorage.getItem('@isHapticsEnabled'),
             ]);
 
-            time === null && _setDefaultsFirstTime('@time', 25);
-            overtime === null && _setDefaultsFirstTime('@overtime', 5);
-            penalty === null && _setDefaultsFirstTime('@penalty', 2);
-            isOppositeDirectionCards === null && _setDefaultsFirstTime('@isOppositeDirectionCards', true);
-            isHapticsEnabled === null && _setDefaultsFirstTime('@isHapticsEnabled', true);
-    
-            setTime(time || 25);
-            setOvertime(overtime || 5);
-            setPenalty(penalty || 2);
-            setIsOppositeDirectionCards(isOppositeDirectionCards === null ? true : !!isOppositeDirectionCards);
-            setIsHapticsEnabled(isHapticsEnabled === null ? true : !!isHapticsEnabled);
-    
+            time === null && _setDefaultsFirstTime('@time', DEFAULT_TIME);
+            overtime === null && _setDefaultsFirstTime('@overtime', DEFAULT_OVERTIME);
+            penalty === null && _setDefaultsFirstTime('@penalty', DEFAULT_PENALTY);
+            isOppositeDirectionCards === null && _setDefaultsFirstTime('@isOppositeDirectionCards', DEFAULT_OPPOSITE_DIRECTION);
+            isHapticsEnabled === null && _setDefaultsFirstTime('@isHapticsEnabled', DEFAULT_HAPTICS_ENABLED);
+
+            setTime(time || DEFAULT_TIME);
+            setOvertime(overtime || DEFAULT_OVERTIME);
+            setPenalty(penalty || DEFAULT_PENALTY);
+            setIsOppositeDirectionCards(isOppositeDirectionCards === null ? DEFAULT_OPPOSITE_DIRECTION : toBool(isOppositeDirectionCards));
+            setIsHapticsEnabled(isHapticsEnabled === null ? DEFAULT_HAPTICS_ENABLED : toBool(isHapticsEnabled));
+
             setLoading(false);
         } catch (error) {
             console.log(error);
