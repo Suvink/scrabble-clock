@@ -18,6 +18,8 @@ const ClockScreen = ({ navigation }) => {
     const [isGameStarted, setIsGameStarted] = useState(false);
     const [resetModalVisible, setResetModalVisible] = useState(false);
     const [runningTaskByPause, setRunningTaskByPause] = useState("");
+    const [isOppositeDirectionCards, setIsOppositeDirectionCards] = useState(true);
+    const [isHapticsEnabled, setIsHapticsEnabled] = useState(true);
 
     //Game settings
     const [gameTime, setGameTime] = useState(13);
@@ -39,6 +41,8 @@ const ClockScreen = ({ navigation }) => {
             const time = await AsyncStorage.getItem('@time');
             const overtime = await AsyncStorage.getItem('@overtime');
             const penalty = await AsyncStorage.getItem('@penalty');
+            const oppositeCardDirection = await AsyncStorage.getItem('@isOppositeDirectionCards');
+            const hapticsEnabled = await AsyncStorage.getItem('@isHapticsEnabled');
 
             if (time !== null) {
                 setGameTime(parseInt(time));
@@ -48,6 +52,12 @@ const ClockScreen = ({ navigation }) => {
             }
             if (penalty !== null) {
                 setGamePenalty(parseInt(penalty));
+            }
+            if (oppositeCardDirection !== null) {
+                setIsOppositeDirectionCards(oppositeCardDirection == "true");
+            }
+            if (hapticsEnabled !== null) {
+                setIsHapticsEnabled(hapticsEnabled == "true");
             }
 
             //Reset the timer UIs
@@ -76,7 +86,7 @@ const ClockScreen = ({ navigation }) => {
     }, [navigation]);
 
     const handlePlayPause = () => {
-        Haptics.notificationAsync(
+        isHapticsEnabled && Haptics.notificationAsync(
             Haptics.NotificationFeedbackType.Warning
         );
         if (!isGameStarted) {
@@ -128,7 +138,7 @@ const ClockScreen = ({ navigation }) => {
     }
 
     const handleBottomTap = () => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        isHapticsEnabled && Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         if (isGameStarted && !isGamePaused) {
             setClockBottomRunning(false);
             setClockTopRunning(true);
@@ -136,7 +146,7 @@ const ClockScreen = ({ navigation }) => {
     }
 
     const handleTopTap = () => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        isHapticsEnabled && Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         if (isGameStarted && !isGamePaused) {
             setClockTopRunning(false);
             setClockBottomRunning(true);
@@ -187,25 +197,11 @@ const ClockScreen = ({ navigation }) => {
     }
 
     const getTopClockStyles = () => {
-        if (topTimeEnded) {
-            return {
-                ...styles.topClockComponent,
-                ...styles.clockActivePenalty
-            };
-        } else {
-            if (clockTopRunning) {
-                return {
-                    ...styles.topClockComponent,
-                    ...styles.clockActive
-                };
-            } else {
-                return {
-                    ...styles.topClockComponent,
-                    ...styles.clockView
-                };
-            }
-        }
-    }
+        const isActive = topTimeEnded || clockTopRunning;
+        const baseStyles = isOppositeDirectionCards ? styles.topClockInverse : {};
+
+        return isActive ? { ...baseStyles, ...styles.clockActive } : { ...baseStyles, ...styles.clockView };
+    };
 
 
     return (
