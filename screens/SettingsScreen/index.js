@@ -21,56 +21,33 @@ const SettingsScreen = () => {
 
     const _getSettingsFromStorage = async () => {
         try {
-            const time = await AsyncStorage.getItem('@time');
-            const overtime = await AsyncStorage.getItem('@overtime');
-            const penalty = await AsyncStorage.getItem('@penalty');
-            const isOppositeDirectionCards = await AsyncStorage.getItem('@isOppositeDirectionCards');
-            const isHapticsEnabled = await AsyncStorage.getItem('@isHapticsEnabled');
+            const [time, overtime, penalty, isOppositeDirectionCards, isHapticsEnabled] = await Promise.all([
+                AsyncStorage.getItem('@time'),
+                AsyncStorage.getItem('@overtime'),
+                AsyncStorage.getItem('@penalty'),
+                AsyncStorage.getItem('@isOppositeDirectionCards'),
+                AsyncStorage.getItem('@isHapticsEnabled'),
+            ]);
 
-            if (time === null) {
-                _setDefaultsFirstTime('@time', 25);
-                setTime(25);
-            } else {
-                setTime(time);
-            }
-
-            if (overtime === null) {
-                _setDefaultsFirstTime('@overtime', 5);
-                setOvertime(5);
-            } else {
-                setOvertime(overtime);
-            }
-
-            if (penalty === null) {
-                _setDefaultsFirstTime('@penalty', 2);
-                setPenalty(2);
-            } else {
-                setPenalty(penalty);
-            }
-
-            if (isOppositeDirectionCards === null) {
-                _setDefaultsFirstTime('@isOppositeDirectionCards', true);
-                setIsOppositeDirectionCards(true);
-            }
-            else {
-                setIsOppositeDirectionCards(isOppositeDirectionCards);
-            }
-
-            if (isHapticsEnabled === null) {
-                _setDefaultsFirstTime('@isHapticsEnabled', true);
-                setIsHapticsEnabled(true);
-            }
-            else {
-                setIsHapticsEnabled(isHapticsEnabled);
-            }
-
-            setLoading(false)
+            time === null && _setDefaultsFirstTime('@time', 25);
+            overtime === null && _setDefaultsFirstTime('@overtime', 5);
+            penalty === null && _setDefaultsFirstTime('@penalty', 2);
+            isOppositeDirectionCards === null && _setDefaultsFirstTime('@isOppositeDirectionCards', true);
+            isHapticsEnabled === null && _setDefaultsFirstTime('@isHapticsEnabled', true);
+    
+            setTime(time || 25);
+            setOvertime(overtime || 5);
+            setPenalty(penalty || 2);
+            setIsOppositeDirectionCards(isOppositeDirectionCards === null ? true : !!isOppositeDirectionCards);
+            setIsHapticsEnabled(isHapticsEnabled === null ? true : !!isHapticsEnabled);
+    
+            setLoading(false);
         } catch (error) {
             console.log(error);
             alert("Could not load settings :(");
             setLoading(false);
         }
-    }
+    };
 
     const _setDefaultsFirstTime = async (key, value) => {
         Keyboard.dismiss();
@@ -138,6 +115,7 @@ const SettingsScreen = () => {
     }
 
     const applyHapticsSettings = (isChecked) => {
+        console.log(isChecked);
         setIsHapticsEnabled(isChecked);
         _setHapticsSettings(isChecked);
     }
