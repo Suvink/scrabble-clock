@@ -129,16 +129,40 @@ const ClockScreen = ({ navigation }) => {
     }
 
     const handleBottomTap = () => {
-        isHapticsEnabled && Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        
+        // Start the game if it hasn't started yet
+        if (!isGameStarted) {
+            isHapticsEnabled && Haptics.notificationAsync(
+                Haptics.NotificationFeedbackType.Warning
+            );
+            setIsGameStarted(true);
+            setIsGamePaused(false);
+            setClockTopRunning(true); // Second player triggers first player's timer
+            return;
+        }
+        // If the game is started and not paused, switch the clocks
         if (isGameStarted && !isGamePaused) {
+            isHapticsEnabled && Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
             setClockBottomRunning(false);
             setClockTopRunning(true);
         }
     }
 
     const handleTopTap = () => {
-        isHapticsEnabled && Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        
+        // Start the game if it hasn't started yet
+        if (!isGameStarted) {
+            isHapticsEnabled && Haptics.notificationAsync(
+                Haptics.NotificationFeedbackType.Warning
+            );
+            setIsGameStarted(true);
+            setIsGamePaused(false);
+            setClockBottomRunning(true); // Second player triggers first player's timer
+            return;
+        }
+        // If the game is started and not paused, switch the clocks
         if (isGameStarted && !isGamePaused) {
+            isHapticsEnabled && Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
             setClockTopRunning(false);
             setClockBottomRunning(true);
         }
@@ -148,7 +172,8 @@ const ClockScreen = ({ navigation }) => {
         setClockTopRunning(false);
         setClockBottomRunning(false);
         setRunningTaskByPause("");
-        setIsGamePaused(true);
+        setIsGamePaused(false);
+        setIsGameStarted(false);
         setBottomClockId(Math.random().toString());
         setTopClockId(Math.random().toString());
         setTopTimeEnded(false);
