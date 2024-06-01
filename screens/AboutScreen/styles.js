@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
         paddingVertical: 20,
     },
-    aboutText: {
+    aboutScreenSubtitleText: {
         fontSize: 14,
         color: "white",
         textAlign: "justify",

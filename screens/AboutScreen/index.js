@@ -10,8 +10,9 @@ const AboutScreen = () => {
         <Layout style={styles.pageContainer}>
             {/* Add the SOC image */}
             <Image source={SOC} style={{ width: 300, height: 200 }} />
+            <Text category='h6' style={styles.aboutScreenSubtitleText}>Version: 1.2.1</Text>
             <View style={styles.textContainer}>
-                <Text category='h6' style={styles.aboutText}>
+                <Text category='h6' style={styles.aboutScreenSubtitleText}>
                     The University of Colombo (UOC) is home to an avid Scrabble community, 
                     which comprises a plethora of skilled players. Over the years, 
                     UoC has dominated the University Scrabble arena, clinching numerous titles and 
@@ -20,6 +21,7 @@ const AboutScreen = () => {
                     Scrabble expertise, where enthusiastic undergraduates of the game can engage in 
                     thrilling matches and hone their skills.
                 </Text>
+                
             </View>
         </Layout>
     );
