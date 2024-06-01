@@ -45,11 +45,12 @@ const ClockScreen = ({ navigation }) => {
         try {
             const keys = ['@time', '@overtime', '@penalty', '@isOppositeDirectionCards', '@isHapticsEnabled'];
             const [time, overtime, penalty, oppositeCardDirection, hapticsEnabled] = await AsyncStorage.multiGet(keys);
-            setGameTime(time ? parseInt(time[1]) : DEFAULT_TIME);
-            setGameOvertime(overtime ? parseInt(overtime[1]) : DEFAULT_OVERTIME);
-            setGamePenalty(penalty ? parseInt(penalty[1]) : DEFAULT_PENALTY);
-            setIsOppositeDirectionCards(oppositeCardDirection ? oppositeCardDirection[1] === "true" : DEFAULT_OPPOSITE_DIRECTION);
-            setIsHapticsEnabled(hapticsEnabled ? hapticsEnabled[1] === "true" : DEFAULT_HAPTICS_ENABLED);
+
+            setGameTime(time[1] ? parseInt(time[1]) : DEFAULT_TIME);
+            setGameOvertime(overtime[1] ? parseInt(overtime[1]) : DEFAULT_OVERTIME);
+            setGamePenalty(penalty[1] ? parseInt(penalty[1]) : DEFAULT_PENALTY);
+            setIsOppositeDirectionCards(oppositeCardDirection[1] ? oppositeCardDirection[1] === "true" : DEFAULT_OPPOSITE_DIRECTION);
+            setIsHapticsEnabled(hapticsEnabled[1] ? hapticsEnabled[1] === "true" : DEFAULT_HAPTICS_ENABLED);
 
             // Reset the timer UIs
             setClockTopRunning(false);
