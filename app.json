@@ -19,7 +19,7 @@
       "bundleIdentifier": "com.suvink.scrabbleclock"
     },
     "android": {
-      "versionCode": 5,
+      "versionCode": 6,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -28,7 +28,8 @@
         "backgroundColor": "#0c1d36",
         "translucent": false
       },
-      "package": "com.suvink.scrabble_o_clock"
+      "package": "com.suvink.scrabble_o_clock",
+      "targetSdkVersion": "34"
     },
     "web": {
       "favicon": "./assets/favicon.png"
