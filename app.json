@@ -40,12 +40,14 @@
       }
     },
     "plugins": [
-      "expo-build-properties",
-      {
-        "android": {
-          "targetSdkVersion": 34
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "targetSdkVersion": 34
+          }
         }
-      }
+      ]
     ]
   }
 }
