@@ -173,7 +173,7 @@ const ClockScreen = ({ navigation }) => {
         setClockTopRunning(false);
         setClockBottomRunning(false);
         setRunningTaskByPause("");
-        setIsGamePaused(false);
+        setIsGamePaused(true);
         setIsGameStarted(false);
         setBottomClockId(Math.random().toString());
         setTopClockId(Math.random().toString());
@@ -182,7 +182,6 @@ const ClockScreen = ({ navigation }) => {
         setTopPenalty("0");
         setBottomPenalty("0");
         setResetModalVisible(false);
-
     }
 
     const handleTopPenalty = (elapsed) => {
