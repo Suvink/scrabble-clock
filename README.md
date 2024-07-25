@@ -12,6 +12,23 @@ Free to use: Scrabble O' Clock is completely free to download and use. There are
 
 Thank you for downloading Scrabble O' Clock! We hope you have a blast playing Scrabble with our app and look forward to hearing your feedback.
 
+## 🚧 Important Updates
+<details>
+  <summary>⚖️ We are changing our license policy!</summary>
+
+  We have recently updated the [license for this project](./LICENCE) from the Apache License to the Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0).
+  #### Why the change?
+   This change was made to ensure that our work remains freely available and beneficial to the community, while protecting it from unauthorized commercial use. We have noticed instances where modified versions of our project (source code) were being sold, potentially scamming users by charging for something that was intended to be free.
+   #### What does this mean for you?
+   <ul>
+      <li><b>Free for Non-Commercial Use:</b>You are welcome to use, modify, and share this project for any non-commercial purposes.</li>
+      <li><b>Attribution Required:</b> Please give appropriate credit, provide a link to the license, and indicate if changes were made.</li>
+      <li><b>ShareAlike:</b> If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.</li>
+      <li><b>Commercial Use:</b> For any commercial use, please contact us for permission.</li>
+   </ul>
+   We believe this change will help protect the integrity of our work and ensure it continues to serve the community in the best way possible. Thank you for your understanding and continued support!
+</details>
+
 ## Local Setup
 
 ### Prerequisites
@@ -47,7 +64,7 @@ Thank you for downloading Scrabble O' Clock! We hope you have a blast playing Sc
 ## FAQs
 Please refer to the [Discussions](https://github.com/Suvink/scrabble-clock/discussions) section.
 
-## Licence
+## License
 This project is licensed under the Apache 2.0 License - see the [LICENSE](https://github.com/Suvink/scrabble-clock/blob/master/LICENCE) file for details.
 
 ## Buy me a coffee
