@@ -10,7 +10,7 @@ const AboutScreen = () => {
         <Layout style={styles.pageContainer}>
             {/* Add the SOC image */}
             <Image source={SOC} style={{ width: 300, height: 200 }} />
-            <Text category='h6' style={styles.aboutScreenSubtitleText}>Version: 1.2.1</Text>
+            <Text category='h6' style={styles.aboutScreenSubtitleText}>Version: 2.0.1</Text>
             <View style={styles.textContainer}>
                 <Text category='h6' style={styles.aboutScreenSubtitleText}>
                     The University of Colombo (UOC) is home to an avid Scrabble community, 
