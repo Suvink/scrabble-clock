@@ -2,14 +2,15 @@ import { StyleSheet } from "react-native";
 import Constants from 'expo-constants'
 
 const styles = StyleSheet.create({
+    safeAreaContainer: {
+        backgroundColor: "#0c1d36",
+    },
     pageContainer: {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
         alignContent: "center",
         justifyItems: "center",
-        height: "100%",
-        marginTop: Constants.statusBarHeight,
         backgroundColor: "#0c1d36"
     },
     settingsBar: {
@@ -19,7 +20,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingLeft: 20,
         paddingRight: 20,
-        height: 70,
+        height: "10%",
         marginTop: 8,
         marginBottom: 8
     },
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         width: '90%',
-        height: "43%",
+        height: "40%",
         borderRadius: 20,
         padding: 20,
     },
@@ -41,14 +42,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         width: '90%',
-        height: "43%",
+        height: "40%",
         borderRadius: 20,
         padding: 20,
     },
     clockActivePenalty: {
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#f90b42',
+        backgroundColor: '#ef4444',
         justifyContent: 'center',
         alignItems: 'center',
         width: '90%',
@@ -69,7 +70,6 @@ const styles = StyleSheet.create({
     modalButtons: {
         display: 'flex',
         flexDirection: 'row',
-        width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 20,
@@ -81,13 +81,16 @@ const styles = StyleSheet.create({
     },
     modalCard: {
         width: '95%',
-        justifyContent: 'center',
         alignItems: 'center',
         marginLeft: 10,
     },
+    modalDangerButton: {
+        backgroundColor: '#ef4444',
+    },
     topClockInverse: {
         transform: "rotate(180deg)"
-    }
+    },
+
 });
 
 export default styles;

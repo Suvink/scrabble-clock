@@ -1,16 +1,16 @@
-import { StyleSheet, Dimensions } from "react-native";
-import Constants from 'expo-constants'
+import { StyleSheet } from "react-native";
 
 
 const styles = StyleSheet.create({
+    safeAreaContainer: {
+        backgroundColor: "#0c1d36",
+    },
     pageContainer: {
         flex: 1,
         justifyContent: "flex-start",
         alignItems: "flex-start",
-        marginTop: Constants.statusBarHeight,
         backgroundColor: "#0c1d36",
         padding: 30,
-        height: "100%"
     },
     pageTitle: {
         color: "white",
@@ -23,7 +23,8 @@ const styles = StyleSheet.create({
     },
     settingSubtitle: {
         color: "white",
-        fontSize: 14
+        fontSize: 14,
+        fontWeight: "normal",
     },
     changeSettingContainer:{
         display: "flex",
@@ -42,9 +43,8 @@ const styles = StyleSheet.create({
         padding: 0,
         height: 48,
         backgroundColor: '#f9cc0b',
-        color: "#0c1d36",
+        color: "black",
         borderColor: '#f9cc0b',
-        
     },
     settingChangeInput: {
         height: 50

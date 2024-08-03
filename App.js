@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import * as eva from '@eva-design/eva';
 import { ApplicationProvider, IconRegistry } from '@ui-kitten/components';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
@@ -6,6 +7,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Constants from 'expo-constants'
+import { useFonts, Roboto_400Regular } from '@expo-google-fonts/roboto';
 
 //screens
 import ClockScreen from './screens/ClockScreen';
@@ -16,10 +18,29 @@ const App = () => {
 
   const Tab = createBottomTabNavigator();
 
+  const [loaded] = useFonts({
+    Roboto_400Regular,
+  });
+
+  const customFontMapping = {
+    ...eva.mapping,
+    strict: {
+      ...eva.mapping.strict,
+      ...Platform.select({
+        ios: {
+          'text-font-family': 'System',
+        },
+        android: {
+          'text-font-family': loaded ? 'Roboto_400Regular' : "System",
+        },
+      }),
+    }
+  };
+
   return (
     <>
       <IconRegistry icons={EvaIconsPack} />
-      <ApplicationProvider {...eva} theme={eva.light}>
+      <ApplicationProvider {...eva} theme={eva.light} mapping={customFontMapping}>
         <NavigationContainer>
           <Tab.Navigator
             initialRouteName="Clock"

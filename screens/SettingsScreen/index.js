@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, SafeAreaView, Keyboard } from 'react-native';
+import { View, Keyboard, Dimensions } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Layout, Text, Button, Divider, Input, Toggle } from '@ui-kitten/components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './styles';
@@ -16,6 +17,8 @@ import { toBool } from "../../utils/utils";
 
 const SettingsScreen = () => {
 
+    const insets = useSafeAreaInsets();
+    const { height: screenHeight } = Dimensions.get('window');
     const [time, setTime] = useState(0);
     const [overtime, setOvertime] = useState(0);
     const [penalty, setPenalty] = useState(0);
@@ -128,9 +131,19 @@ const SettingsScreen = () => {
         _setHapticsSettings(isChecked);
     }
 
+    const getParentLayoutStyles = () => {
+        // Adjust the screen size when a safe area is present
+        const screenStyles =  {
+            ...styles.pageContainer,
+            minHeight: (parentScreenHeight/screenHeight) * 100 + "%",
+            height: (parentScreenHeight/screenHeight) * 100 + "%"
+        } 
+        return screenStyles;  
+    }
+
     return (
         <PTRView onRefresh={_getSettingsFromStorage} keyboardShouldPersistTaps="handled" style={{ height: "100%", backgroundColor: "#0c1d36" }}>
-            <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
+            <SafeAreaView style={styles.safeAreaContainer}>
                 {!loading ? <Layout style={styles.pageContainer}>
                     <Text category='h1' style={styles.pageTitle}>SETTINGS</Text>
                     <View>
