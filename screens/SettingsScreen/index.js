@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Keyboard, Dimensions } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Layout, Text, Button, Divider, Input, Toggle } from "@ui-kitten/components";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "./styles";
@@ -16,7 +16,6 @@ import {
 import { toBool } from "../../utils/utils";
 
 const SettingsScreen = () => {
-  const insets = useSafeAreaInsets();
   const { height: screenHeight } = Dimensions.get("window");
   const [time, setTime] = useState(0);
   const [overtime, setOvertime] = useState(0);
@@ -170,8 +169,7 @@ const SettingsScreen = () => {
                 </View>
                 <View style={styles.changeSettingRight}>
                   <Button size="small" style={styles.settingChangeButton} onPress={_setGameTime}>
-                    {" "}
-                    Save{" "}
+                    Save
                   </Button>
                 </View>
               </View>
@@ -190,6 +188,7 @@ const SettingsScreen = () => {
                 <View style={styles.changeSettingLeft}>
                   <Input
                     size="large"
+                    keyboardType="numeric"
                     placeholder="Time in minutes"
                     defaultValue={overtime.toString()}
                     style={styles.settingChangeInput}
@@ -198,8 +197,7 @@ const SettingsScreen = () => {
                 </View>
                 <View style={styles.changeSettingRight}>
                   <Button size="small" style={styles.settingChangeButton} onPress={_setOverTimeLimit}>
-                    {" "}
-                    Save{" "}
+                    Save
                   </Button>
                 </View>
               </View>
