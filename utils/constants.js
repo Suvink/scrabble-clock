@@ -4,6 +4,6 @@ export const DEFAULT_PENALTY = 2;
 export const DEFAULT_OPPOSITE_DIRECTION = true;
 export const DEFAULT_HAPTICS_ENABLED = true;
 export const BoolValues = {
-    TRUE: "true",
-    FALSE: "false"
-}
+  TRUE: "true",
+  FALSE: "false",
+};
