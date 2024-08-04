@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-
 import { StyleSheet, View, Text, TouchableOpacity, AppState } from "react-native";
 import _ from "lodash";
 import { sprintf } from "sprintf-js";
