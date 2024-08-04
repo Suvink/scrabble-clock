@@ -10,7 +10,7 @@ const AboutScreen = () => {
       {/* Add the SOC image */}
       <Image source={SOC} style={{ width: 300, height: 200 }} />
       <Text category="h6" style={styles.aboutScreenSubtitleText}>
-        Version: 2.0.1
+        Version: 2.1.0
       </Text>
       <View style={styles.textContainer}>
         <Text category="h6" style={styles.aboutScreenSubtitleText}>
