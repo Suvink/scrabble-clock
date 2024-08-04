@@ -28,6 +28,7 @@ const ClockScreen = ({ navigation }) => {
   const [runningTaskByPause, setRunningTaskByPause] = useState("");
   const [isOppositeDirectionCards, setIsOppositeDirectionCards] = useState(true);
   const [isHapticsEnabled, setIsHapticsEnabled] = useState(true);
+  const [parentLayoutStyles, setParentLayoutStyles] = useState({});
 
   //Game settings
   const [gameTime, setGameTime] = useState(13);
@@ -223,9 +224,13 @@ const ClockScreen = ({ navigation }) => {
     return screenStyles;
   };
 
+  useEffect(() => {
+    setParentLayoutStyles(getParentLayoutStyles());
+  }, [insets]);
+
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
-      <Layout style={getParentLayoutStyles()}>
+      <Layout style={parentLayoutStyles}>
         <Pressable
           style={topTimeEnded ? styles.clockActivePenalty : clockTopRunning ? styles.clockActive : styles.clockView}
           onPress={handleTopTap}
