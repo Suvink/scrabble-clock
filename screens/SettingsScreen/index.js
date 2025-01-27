@@ -68,7 +68,7 @@ const SettingsScreen = () => {
   };
 
   const _setGameTime = async () => {
-    if (time !== null && time > 0) {
+    if (validateTime(time)) {
       try {
         await AsyncStorage.setItem("@time", time.toString());
         alert("Successfully saved :)");
@@ -79,7 +79,7 @@ const SettingsScreen = () => {
   };
 
   const _setOverTimeLimit = async () => {
-    if (overtime !== null && overtime > 0) {
+    if (validateTime(overtime)) {
       try {
         await AsyncStorage.setItem("@overtime", overtime.toString());
         alert("Successfully saved :)");
@@ -90,7 +90,7 @@ const SettingsScreen = () => {
   };
 
   const _setPenaltyTime = async () => {
-    if (penalty !== null && penalty > 0) {
+    if (validateTime(penalty)) {
       try {
         await AsyncStorage.setItem("@penalty", penalty.toString());
         alert("Successfully saved :)");
@@ -127,6 +127,14 @@ const SettingsScreen = () => {
     console.log(isChecked);
     setIsHapticsEnabled(isChecked);
     _setHapticsSettings(isChecked);
+  };
+
+  const validateTime = (time) => {
+    const parsedTime = Number(time);
+    if (!isNaN(parsedTime) && Number.isInteger(parsedTime)) {
+      return true;
+    }
+    alert("⚠️ Please enter a valid time");
   };
 
   const getParentLayoutStyles = () => {
