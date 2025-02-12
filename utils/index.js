@@ -7,15 +7,12 @@
  * License details: https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-import { StyleSheet } from 'react-native';
+import { BoolValues } from '../constants';
 
-const styles = StyleSheet.create({
-    indicator: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: 900,
-        backgroundColor: '#0c1d36',
-    },
-});
-
-export default styles;
+export const toBool = (value) => {
+    if (value === BoolValues.TRUE) {
+        return true;
+    } else if (value === BoolValues.FALSE) {
+        return false;
+    }
+};

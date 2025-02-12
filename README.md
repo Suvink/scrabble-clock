@@ -65,7 +65,7 @@ Thank you for downloading Scrabble O' Clock! We hope you have a blast playing Sc
 Please refer to the [Discussions](https://github.com/Suvink/scrabble-clock/discussions) section.
 
 ## License
-This project is licensed under the Apache 2.0 License - see the [LICENSE](https://github.com/Suvink/scrabble-clock/blob/master/LICENCE) file for details.
+This project is licensed under the Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) License - see the [LICENSE](https://github.com/Suvink/scrabble-clock/blob/master/LICENCE) file for details.
 
 ## Buy me a coffee
 
