@@ -24,8 +24,10 @@ import {
     DEFAULT_OPPOSITE_DIRECTION,
     DEFAULT_HAPTICS_ENABLED,
 } from '../../constants';
+import { useGameState } from '../../contexts/GameStateContext';
 
 const ClockScreen = ({ navigation }) => {
+    const { setIsGameStarted: setGlobalGameStarted } = useGameState();
     const insets = useSafeAreaInsets();
     const { height: screenHeight } = Dimensions.get('window');
     const parentScreenHeight = screenHeight - insets.top;
@@ -218,13 +220,6 @@ const ClockScreen = ({ navigation }) => {
         }
     };
 
-    const getTopClockStyles = () => {
-        const isActive = topTimeEnded || clockTopRunning;
-        const baseStyles = isOppositeDirectionCards ? styles.topClockInverse : {};
-
-        return isActive ? { ...baseStyles, ...styles.clockActive } : { ...baseStyles, ...styles.clockView };
-    };
-
     const getParentLayoutStyles = () => {
         // Adjust the screen size when a safe area is present
         const screenStyles = {
@@ -239,50 +234,50 @@ const ClockScreen = ({ navigation }) => {
         setParentLayoutStyles(getParentLayoutStyles());
     }, [insets]);
 
+    // Update global game state when local game state changes
+    useEffect(() => {
+        setGlobalGameStarted(isGameStarted);
+    }, [isGameStarted, setGlobalGameStarted]);
+
     return (
         <SafeAreaView style={styles.safeAreaContainer}>
             <Layout style={parentLayoutStyles}>
                 <Pressable
-                    style={
+                    style={[
                         topTimeEnded
                             ? styles.clockActivePenalty
                             : clockTopRunning
                               ? styles.clockActive
-                              : styles.clockView
-                    }
+                              : styles.clockView,
+                        isOppositeDirectionCards ? styles.topClockInverse : {},
+                    ]}
                     onPress={handleTopTap}
                 >
-                    <View style={getTopClockStyles()}>
-                        {gameTime && gameOvertime && gamePenalty && (
-                            <CountDown
-                                until={gameTime * 60}
-                                onFinish={() => setTopTimeEnded(true)}
-                                timeToShow={['M', 'S']}
-                                size={80}
-                                digitStyle={{ backgroundColor: 'transparent' }}
-                                digitTxtStyle={{ color: '#222B45', fontSize: 120 }}
-                                timeLabels={{}}
-                                showSeparator={true}
-                                separatorStyle={{ padding: 0, margin: 0 }}
-                                running={clockTopRunning}
-                                id={topClockId || 456}
-                                onChange={handleTopPenalty}
-                                onAppBackground={handleBackgroundState}
-                                isGameStarted={isGameStarted}
-                            />
-                        )}
-                        {topTimeEnded && <Text category="h2">{topPenalty}</Text>}
-                    </View>
+                    {gameTime && gameOvertime && gamePenalty && (
+                        <CountDown
+                            until={gameTime * 60}
+                            onFinish={() => setTopTimeEnded(true)}
+                            timeToShow={['M', 'S']}
+                            size={80}
+                            digitStyle={{ backgroundColor: 'transparent' }}
+                            digitTxtStyle={{ color: '#222B45', fontSize: 120 }}
+                            timeLabels={{}}
+                            showSeparator={true}
+                            separatorStyle={{ padding: 0, margin: 0 }}
+                            running={clockTopRunning}
+                            id={topClockId || 456}
+                            onChange={handleTopPenalty}
+                            onAppBackground={handleBackgroundState}
+                            isGameStarted={isGameStarted}
+                        />
+                    )}
+                    {topTimeEnded && (
+                        <Text category="h2" style={styles.penaltyText}>
+                            {topPenalty}
+                        </Text>
+                    )}
                 </Pressable>
                 <View style={styles.settingsBar}>
-                    <Pressable
-                        style={styles.settingsButton}
-                        onPress={() => {
-                            navigation.navigate('Settings');
-                        }}
-                    >
-                        <Ionicons name="time" size={50} color="white" style={{ padding: 0 }} />
-                    </Pressable>
                     <Pressable style={styles.settingsButton} onPress={handlePlayPause}>
                         {isGamePaused ? (
                             <Ionicons name="play" size={50} color="white" style={{ padding: 0 }} />
@@ -291,7 +286,12 @@ const ClockScreen = ({ navigation }) => {
                         )}
                     </Pressable>
                     <Pressable style={styles.settingsButton} onPress={() => setResetModalVisible(true)}>
-                        <Ionicons name="refresh" size={50} color="white" style={{ padding: 0 }} />
+                        <Ionicons
+                            name={isGameStarted ? 'stop' : 'refresh'}
+                            size={50}
+                            color="white"
+                            style={{ padding: 0 }}
+                        />
                     </Pressable>
                 </View>
                 <Pressable
@@ -304,15 +304,7 @@ const ClockScreen = ({ navigation }) => {
                     }
                     onPress={handleBottomTap}
                 >
-                    <View
-                        style={
-                            bottomTimeEnded
-                                ? styles.clockActivePenalty
-                                : clockBottomRunning
-                                  ? styles.clockActive
-                                  : styles.clockView
-                        }
-                    >
+                    {gameTime && gameOvertime && gamePenalty && (
                         <CountDown
                             until={gameTime * 60}
                             onFinish={() => setBottomTimeEnded(true)}
@@ -329,14 +321,18 @@ const ClockScreen = ({ navigation }) => {
                             onAppBackground={handleBackgroundState}
                             isGameStarted={isGameStarted}
                         />
-                        {bottomTimeEnded && <Text category="h2">{bottomPenalty}</Text>}
-                    </View>
+                    )}
+                    {bottomTimeEnded && (
+                        <Text category="h2" style={styles.penaltyText}>
+                            {bottomPenalty}
+                        </Text>
+                    )}
                 </Pressable>
             </Layout>
             <StatusBar hidden={true} backgroundColor="#000000" style="dark" />
             <Modal visible={resetModalVisible} backdropStyle={styles.backdrop}>
                 <Card disabled={true} style={styles.modalCard}>
-                    <Text category="h6">Are you sure you want to reset the timer?</Text>
+                    <Text category="h6">Are you sure you want to stop and reset the timer?</Text>
                     <Layout level="1" style={styles.modalButtons}>
                         <Button
                             appearance="outline"

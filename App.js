@@ -21,10 +21,77 @@ import { useFonts, Roboto_400Regular } from '@expo-google-fonts/roboto';
 import ClockScreen from './screens/ClockScreen';
 import AboutScreen from './screens/AboutScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import { GameStateProvider, useGameState } from './contexts/GameStateContext';
+
+const TabNavigator = () => {
+    const Tab = createBottomTabNavigator();
+    const { isGameStarted } = useGameState();
+
+    return (
+        <Tab.Navigator
+            initialRouteName="Clock"
+            screenOptions={({ route }) => ({
+                tabBarIcon: ({ focused, color, size }) => {
+                    let iconName;
+
+                    if (route.name === 'About') {
+                        iconName = focused ? 'information-circle' : 'information-circle-outline';
+                    } else if (route.name === 'Clock') {
+                        iconName = focused ? 'time' : 'time-outline';
+                    } else if (route.name === 'Settings') {
+                        iconName = focused ? 'settings' : 'settings-outline';
+                    }
+                    return <Ionicons name={iconName} size={size} color={'#f9cc0b'} />;
+                },
+                tabBarStyle: {
+                    backgroundColor: '#0c1d36',
+                    borderColor: '#0c1d36',
+                    activeTintColor: '#f9cc0b',
+                    borderTopWidth: 0,
+                    display: isGameStarted ? 'none' : 'flex',
+                },
+                headerShown: false,
+            })}
+        >
+            <Tab.Screen
+                name="About"
+                component={AboutScreen}
+                options={{
+                    title: '',
+                    headerMode: 'none',
+                    headerShown: false,
+                    tabBarLabel: 'About',
+                    tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: '#f9cc0b' },
+                    headerStyle: { marginTop: Constants.statusBarHeight },
+                }}
+            />
+            <Tab.Screen
+                name="Clock"
+                component={ClockScreen}
+                options={{
+                    title: '',
+                    headerShown: false,
+                    tabBarLabel: 'Clock',
+                    tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: '#f9cc0b' },
+                    headerStyle: { marginTop: Constants.statusBarHeight },
+                }}
+            />
+            <Tab.Screen
+                name="Settings"
+                component={SettingsScreen}
+                options={{
+                    title: '',
+                    headerShown: false,
+                    tabBarLabel: 'Settings',
+                    tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: '#f9cc0b' },
+                    headerStyle: { marginTop: Constants.statusBarHeight },
+                }}
+            />
+        </Tab.Navigator>
+    );
+};
 
 const App = () => {
-    const Tab = createBottomTabNavigator();
-
     const [loaded] = useFonts({
         Roboto_400Regular,
     });
@@ -48,67 +115,11 @@ const App = () => {
         <>
             <IconRegistry icons={EvaIconsPack} />
             <ApplicationProvider {...eva} theme={eva.light} mapping={customFontMapping}>
-                <NavigationContainer>
-                    <Tab.Navigator
-                        initialRouteName="Clock"
-                        screenOptions={({ route }) => ({
-                            tabBarIcon: ({ focused, color, size }) => {
-                                let iconName;
-
-                                if (route.name === 'About') {
-                                    iconName = focused ? 'information-circle' : 'information-circle-outline';
-                                } else if (route.name === 'Clock') {
-                                    iconName = focused ? 'time' : 'time-outline';
-                                } else if (route.name === 'Settings') {
-                                    iconName = focused ? 'settings' : 'settings-outline';
-                                }
-                                return <Ionicons name={iconName} size={size} color={'#f9cc0b'} />;
-                            },
-                            tabBarStyle: {
-                                backgroundColor: '#0c1d36',
-                                borderColor: '#0c1d36',
-                                activeTintColor: '#f9cc0b',
-                                borderTopWidth: 0,
-                            },
-                            headerShown: false,
-                        })}
-                    >
-                        <Tab.Screen
-                            name="About"
-                            component={AboutScreen}
-                            options={{
-                                title: '',
-                                headerMode: 'none',
-                                headerShown: false,
-                                tabBarLabel: 'About',
-                                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: '#f9cc0b' },
-                                headerStyle: { marginTop: Constants.statusBarHeight },
-                            }}
-                        />
-                        <Tab.Screen
-                            name="Clock"
-                            component={ClockScreen}
-                            options={{
-                                title: '',
-                                headerShown: false,
-                                tabBarLabel: 'Clock',
-                                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: '#f9cc0b' },
-                                headerStyle: { marginTop: Constants.statusBarHeight },
-                            }}
-                        />
-                        <Tab.Screen
-                            name="Settings"
-                            component={SettingsScreen}
-                            options={{
-                                title: '',
-                                headerShown: false,
-                                tabBarLabel: 'Settings',
-                                tabBarLabelStyle: { fontSize: 14, marginBottom: 5, color: '#f9cc0b' },
-                                headerStyle: { marginTop: Constants.statusBarHeight },
-                            }}
-                        />
-                    </Tab.Navigator>
-                </NavigationContainer>
+                <GameStateProvider>
+                    <NavigationContainer>
+                        <TabNavigator />
+                    </NavigationContainer>
+                </GameStateProvider>
             </ApplicationProvider>
         </>
     );

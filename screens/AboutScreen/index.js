@@ -28,7 +28,7 @@ const AboutScreen = () => {
                 <Image source={SOCLogo} style={{ width: 300, height: 200 }} />
             )}
             <Text category="h6" style={styles.aboutScreenSubtitleText}>
-                Version: 3.0.0
+                Version: 3.1.0
             </Text>
             <View style={styles.textContainer}>
                 {isIos ? (

@@ -99,6 +99,13 @@ const styles = StyleSheet.create({
     topClockInverse: {
         transform: 'rotate(180deg)',
     },
+    penaltyText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#222B45',
+        textAlign: 'center',
+        marginTop: 10,
+    },
 });
 
 export default styles;
