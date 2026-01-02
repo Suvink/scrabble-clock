@@ -50,13 +50,13 @@ Thank you for downloading Scrabble O' Clock! We hope you have a blast playing Sc
 5. Install dependancies
    
    ```bash
-   yarn install
+   npm install
    ```
    
 7. Run the development server
    
    ```bash
-   yarn start
+   npm start
    ```
    
 9. Scan the QR code displayed on your terminal from your Expo Go Mobile App.
