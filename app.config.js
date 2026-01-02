@@ -74,7 +74,7 @@ export default {
                 translucent: false,
             },
             package: 'com.suvink.scrabble_o_clock',
-            targetSdkVersion: '34',
+            targetSdkVersion: '35',
         },
         web: {
             favicon: assets.favicon,
@@ -89,7 +89,7 @@ export default {
                 'expo-build-properties',
                 {
                     android: {
-                        targetSdkVersion: 34,
+                        targetSdkVersion: 35,
                     },
                 },
             ],
