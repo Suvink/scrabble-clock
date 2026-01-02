@@ -11,7 +11,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Pressable, Dimensions } from 'react-native';
 import { Layout, Text, Button, Card, Modal } from '@ui-kitten/components';
 import styles from './styles';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { StatusBar } from 'expo-status-bar';
 import CountDown from '../../packages/CountdownTimer';
 import AsyncStorage from '@react-native-async-storage/async-storage';

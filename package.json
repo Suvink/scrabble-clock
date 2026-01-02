@@ -15,6 +15,7 @@
     "@expo-google-fonts/roboto": "^0.2.3",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-masked-view/masked-view": "0.3.2",
+    "@react-native-vector-icons/ionicons": "^12.3.0",
     "@react-navigation/bottom-tabs": "^6.5.7",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.12",
@@ -46,6 +47,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "babel-preset-expo": "^54.0.9",
     "globals": "^15.9.0",
     "prettier": "3.3.3"
   },
