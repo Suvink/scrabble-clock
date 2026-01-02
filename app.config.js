@@ -64,7 +64,7 @@ export default {
             bundleIdentifier: 'com.suvink.scrabbleclock',
         },
         android: {
-            versionCode: 13,
+            versionCode: 14,
             adaptiveIcon: {
                 foregroundImage: assets.adaptiveIcon,
                 backgroundColor: '#ffffff',
