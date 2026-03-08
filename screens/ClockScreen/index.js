@@ -17,13 +17,14 @@ import CountDown from '../../packages/CountdownTimer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
-import { KeepAwake } from 'expo-keep-awake';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import {
     DEFAULT_TIME,
     DEFAULT_OVERTIME,
     DEFAULT_PENALTY,
     DEFAULT_OPPOSITE_DIRECTION,
     DEFAULT_HAPTICS_ENABLED,
+    DEFAULT_STOP_ON_TIME_END,
 } from '../../constants';
 import { useGameState } from '../../contexts/GameStateContext';
 
@@ -40,6 +41,7 @@ const ClockScreen = ({ navigation }) => {
     const [runningTaskByPause, setRunningTaskByPause] = useState('');
     const [isOppositeDirectionCards, setIsOppositeDirectionCards] = useState(true);
     const [isHapticsEnabled, setIsHapticsEnabled] = useState(true);
+    const [isStopOnTimeEnd, setIsStopOnTimeEnd] = useState(DEFAULT_STOP_ON_TIME_END);
     const [parentLayoutStyles, setParentLayoutStyles] = useState({});
 
     //Game settings (gameTime and gameOvertime are in seconds)
@@ -59,8 +61,8 @@ const ClockScreen = ({ navigation }) => {
 
     const getSettings = async () => {
         try {
-            const keys = ['@time', '@overtime', '@penalty', '@isOppositeDirectionCards', '@isHapticsEnabled'];
-            const [time, overtime, penalty, oppositeCardDirection, hapticsEnabled] = await AsyncStorage.multiGet(keys);
+            const keys = ['@time', '@overtime', '@penalty', '@isOppositeDirectionCards', '@isHapticsEnabled', '@stopOnTimeEnd'];
+            const [time, overtime, penalty, oppositeCardDirection, hapticsEnabled, stopOnTimeEnd] = await AsyncStorage.multiGet(keys);
 
             // Migrate old format (minutes) to new format (total seconds)
             const migrateToSeconds = (value, defaultVal) => {
@@ -75,6 +77,7 @@ const ClockScreen = ({ navigation }) => {
                 oppositeCardDirection[1] ? oppositeCardDirection[1] === 'true' : DEFAULT_OPPOSITE_DIRECTION
             );
             setIsHapticsEnabled(hapticsEnabled[1] ? hapticsEnabled[1] === 'true' : DEFAULT_HAPTICS_ENABLED);
+            setIsStopOnTimeEnd(stopOnTimeEnd[1] ? stopOnTimeEnd[1] === 'true' : DEFAULT_STOP_ON_TIME_END);
 
             // Reset the timer UIs
             setClockTopRunning(false);
@@ -246,6 +249,16 @@ const ClockScreen = ({ navigation }) => {
         setGlobalGameStarted(isGameStarted);
     }, [isGameStarted, setGlobalGameStarted]);
 
+    // Keep screen awake during game
+    useEffect(() => {
+        if (isGameStarted) {
+            activateKeepAwakeAsync();
+        } else {
+            deactivateKeepAwake();
+        }
+        return () => deactivateKeepAwake();
+    }, [isGameStarted]);
+
     return (
         <SafeAreaView style={styles.safeAreaContainer}>
             <Layout style={parentLayoutStyles}>
@@ -263,7 +276,15 @@ const ClockScreen = ({ navigation }) => {
                     {gameTime != null && gameOvertime != null && gamePenalty != null && (
                         <CountDown
                             until={gameTime}
-                            onFinish={() => setTopTimeEnded(true)}
+                            onFinish={() => {
+                                setTopTimeEnded(true);
+                                if (isStopOnTimeEnd) {
+                                    setClockTopRunning(false);
+                                    setClockBottomRunning(false);
+                                    setIsGamePaused(true);
+                                    setRunningTaskByPause('top');
+                                }
+                            }}
                             timeToShow={['M', 'S']}
                             size={80}
                             digitStyle={{ backgroundColor: 'transparent' }}
@@ -278,7 +299,7 @@ const ClockScreen = ({ navigation }) => {
                             isGameStarted={isGameStarted}
                         />
                     )}
-                    {topTimeEnded && (
+                    {topTimeEnded && !isStopOnTimeEnd && (
                         <Text category="h2" style={styles.penaltyText}>
                             {topPenalty}
                         </Text>
@@ -314,7 +335,15 @@ const ClockScreen = ({ navigation }) => {
                     {gameTime != null && gameOvertime != null && gamePenalty != null && (
                         <CountDown
                             until={gameTime}
-                            onFinish={() => setBottomTimeEnded(true)}
+                            onFinish={() => {
+                                setBottomTimeEnded(true);
+                                if (isStopOnTimeEnd) {
+                                    setClockTopRunning(false);
+                                    setClockBottomRunning(false);
+                                    setIsGamePaused(true);
+                                    setRunningTaskByPause('bottom');
+                                }
+                            }}
                             timeToShow={['M', 'S']}
                             size={80}
                             digitStyle={{ backgroundColor: 'transparent' }}
@@ -329,7 +358,7 @@ const ClockScreen = ({ navigation }) => {
                             isGameStarted={isGameStarted}
                         />
                     )}
-                    {bottomTimeEnded && (
+                    {bottomTimeEnded && !isStopOnTimeEnd && (
                         <Text category="h2" style={styles.penaltyText}>
                             {bottomPenalty}
                         </Text>
@@ -337,7 +366,6 @@ const ClockScreen = ({ navigation }) => {
                 </Pressable>
             </Layout>
             <StatusBar hidden={true} backgroundColor="#000000" style="dark" />
-            {isGameStarted && <KeepAwake />}
             <Modal visible={resetModalVisible} backdropStyle={styles.backdrop}>
                 <Card disabled={true} style={styles.modalCard}>
                     <Text category="h6">Are you sure you want to stop and reset the timer?</Text>

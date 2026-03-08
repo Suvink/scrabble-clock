@@ -13,6 +13,7 @@ const DEFAULT_OVERTIME = 300; // 5 minutes in seconds
 const DEFAULT_PENALTY = 2;
 const DEFAULT_OPPOSITE_DIRECTION = true;
 const DEFAULT_HAPTICS_ENABLED = true;
+const DEFAULT_STOP_ON_TIME_END = false;
 
 const BoolValues = {
     TRUE: 'true',
@@ -28,6 +29,7 @@ export {
     DEFAULT_PENALTY,
     DEFAULT_OPPOSITE_DIRECTION,
     DEFAULT_HAPTICS_ENABLED,
+    DEFAULT_STOP_ON_TIME_END,
     BoolValues,
     PLATFORM_IOS,
 };

@@ -22,6 +22,7 @@ import {
     DEFAULT_PENALTY,
     DEFAULT_OPPOSITE_DIRECTION,
     DEFAULT_HAPTICS_ENABLED,
+    DEFAULT_STOP_ON_TIME_END,
 } from '../../constants';
 import { toBool } from '../../utils';
 
@@ -35,6 +36,7 @@ const SettingsScreen = () => {
     const [loading, setLoading] = useState(true);
     const [isOppositeDirectionCards, setIsOppositeDirectionCards] = useState(true);
     const [isHapticsEnabled, setIsHapticsEnabled] = useState(true);
+    const [isStopOnTimeEnd, setIsStopOnTimeEnd] = useState(false);
 
     useEffect(() => {
         _getSettingsFromStorage();
@@ -49,17 +51,19 @@ const SettingsScreen = () => {
 
     const _getSettingsFromStorage = async () => {
         try {
-            const [time, overtime, penalty, isOppositeDirectionCards, isHapticsEnabled] = await Promise.all([
+            const [time, overtime, penalty, isOppositeDirectionCards, isHapticsEnabled, stopOnTimeEnd] = await Promise.all([
                 AsyncStorage.getItem('@time'),
                 AsyncStorage.getItem('@overtime'),
                 AsyncStorage.getItem('@penalty'),
                 AsyncStorage.getItem('@isOppositeDirectionCards'),
                 AsyncStorage.getItem('@isHapticsEnabled'),
+                AsyncStorage.getItem('@stopOnTimeEnd'),
             ]);
 
             isOppositeDirectionCards === null &&
                 _setDefaultsFirstTime('@isOppositeDirectionCards', DEFAULT_OPPOSITE_DIRECTION);
             isHapticsEnabled === null && _setDefaultsFirstTime('@isHapticsEnabled', DEFAULT_HAPTICS_ENABLED);
+            stopOnTimeEnd === null && _setDefaultsFirstTime('@stopOnTimeEnd', DEFAULT_STOP_ON_TIME_END);
             penalty === null && _setDefaultsFirstTime('@penalty', DEFAULT_PENALTY);
 
             // Migrate old format (minutes) to new format (total seconds)
@@ -92,6 +96,7 @@ const SettingsScreen = () => {
                 isOppositeDirectionCards === null ? DEFAULT_OPPOSITE_DIRECTION : toBool(isOppositeDirectionCards)
             );
             setIsHapticsEnabled(isHapticsEnabled === null ? DEFAULT_HAPTICS_ENABLED : toBool(isHapticsEnabled));
+            setIsStopOnTimeEnd(stopOnTimeEnd === null ? DEFAULT_STOP_ON_TIME_END : toBool(stopOnTimeEnd));
 
             setLoading(false);
         } catch (error) {
@@ -148,6 +153,7 @@ const SettingsScreen = () => {
 
     const _setGameTime = async () => {
         if (validateMinutesSeconds(timeMinutes, timeSeconds, 'Game time')) {
+            Keyboard.dismiss();
             const totalSeconds = Number(timeMinutes) * 60 + Number(timeSeconds);
             try {
                 await AsyncStorage.setItem('@time', totalSeconds.toString());
@@ -160,6 +166,7 @@ const SettingsScreen = () => {
 
     const _setOverTimeLimit = async () => {
         if (validateMinutesSeconds(overtimeMinutes, overtimeSeconds, 'Overtime')) {
+            Keyboard.dismiss();
             const totalSeconds = Number(overtimeMinutes) * 60 + Number(overtimeSeconds);
             try {
                 await AsyncStorage.setItem('@overtime', totalSeconds.toString());
@@ -172,6 +179,7 @@ const SettingsScreen = () => {
 
     const _setPenaltyTime = async () => {
         if (validatePenalty(penalty)) {
+            Keyboard.dismiss();
             try {
                 await AsyncStorage.setItem('@penalty', penalty.toString());
                 alert('Successfully saved :)');
@@ -208,6 +216,20 @@ const SettingsScreen = () => {
         console.log(isChecked);
         setIsHapticsEnabled(isChecked);
         _setHapticsSettings(isChecked);
+    };
+
+    const _setStopOnTimeEndSetting = async (status) => {
+        try {
+            await AsyncStorage.setItem('@stopOnTimeEnd', status.toString());
+            alert('Successfully saved :)');
+        } catch (error) {
+            alert('Could not save setting :(');
+        }
+    };
+
+    const applyStopOnTimeEnd = (isChecked) => {
+        setIsStopOnTimeEnd(isChecked);
+        _setStopOnTimeEndSetting(isChecked);
     };
 
     const showInfo = (title, message) => {
@@ -283,7 +305,7 @@ const SettingsScreen = () => {
                             </View>
                             <Divider style={styles.divider} />
                         </View>
-                        <View>
+                        <View style={isStopOnTimeEnd ? styles.disabledSection : null} pointerEvents={isStopOnTimeEnd ? 'none' : 'auto'}>
                             <View style={styles.settingContainer}>
                                 <View style={styles.settingTitleRow}>
                                     <Text category="h4" style={styles.settingTitle}>
@@ -334,7 +356,7 @@ const SettingsScreen = () => {
                             </View>
                             <Divider style={styles.divider} />
                         </View>
-                        <View>
+                        <View style={isStopOnTimeEnd ? styles.disabledSection : null} pointerEvents={isStopOnTimeEnd ? 'none' : 'auto'}>
                             <View style={styles.settingContainer}>
                                 <View style={styles.settingTitleRow}>
                                     <Text category="h4" style={styles.settingTitle}>
@@ -407,6 +429,21 @@ const SettingsScreen = () => {
                                         status="warning"
                                         checked={isHapticsEnabled}
                                         onChange={applyHapticsSettings}
+                                    />
+                                </View>
+                            </View>
+                            <View style={styles.changeSettingContainer}>
+                                <View style={styles.changeSettingLeft}>
+                                    <Text category="h5" style={styles.personalizationSettingsText}>
+                                        Stop game when time is over
+                                    </Text>
+                                </View>
+                                <View style={styles.changeSettingRight}>
+                                    <Toggle
+                                        size="small"
+                                        status="warning"
+                                        checked={isStopOnTimeEnd}
+                                        onChange={applyStopOnTimeEnd}
                                     />
                                 </View>
                             </View>

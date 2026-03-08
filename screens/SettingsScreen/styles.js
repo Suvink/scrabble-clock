@@ -100,6 +100,9 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginHorizontal: 6,
     },
+    disabledSection: {
+        opacity: 0.3,
+    },
 });
 
 export default styles;
