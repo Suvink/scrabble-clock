@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import { useAudioPlayer } from 'expo-audio';
 import {
     DEFAULT_TIME,
     DEFAULT_OVERTIME,
@@ -25,6 +26,7 @@ import {
     DEFAULT_OPPOSITE_DIRECTION,
     DEFAULT_HAPTICS_ENABLED,
     DEFAULT_STOP_ON_TIME_END,
+    DEFAULT_AUDIO_ALERT_ENABLED,
 } from '../../constants';
 import { useGameState } from '../../contexts/GameStateContext';
 
@@ -42,6 +44,7 @@ const ClockScreen = ({ navigation }) => {
     const [isOppositeDirectionCards, setIsOppositeDirectionCards] = useState(true);
     const [isHapticsEnabled, setIsHapticsEnabled] = useState(true);
     const [isStopOnTimeEnd, setIsStopOnTimeEnd] = useState(DEFAULT_STOP_ON_TIME_END);
+    const [isAudioAlertEnabled, setIsAudioAlertEnabled] = useState(DEFAULT_AUDIO_ALERT_ENABLED);
     const [parentLayoutStyles, setParentLayoutStyles] = useState({});
 
     //Game settings (gameTime and gameOvertime are in seconds)
@@ -61,8 +64,8 @@ const ClockScreen = ({ navigation }) => {
 
     const getSettings = async () => {
         try {
-            const keys = ['@time', '@overtime', '@penalty', '@isOppositeDirectionCards', '@isHapticsEnabled', '@stopOnTimeEnd'];
-            const [time, overtime, penalty, oppositeCardDirection, hapticsEnabled, stopOnTimeEnd] = await AsyncStorage.multiGet(keys);
+            const keys = ['@time', '@overtime', '@penalty', '@isOppositeDirectionCards', '@isHapticsEnabled', '@stopOnTimeEnd', '@audioAlertEnabled'];
+            const [time, overtime, penalty, oppositeCardDirection, hapticsEnabled, stopOnTimeEnd, audioAlertEnabled] = await AsyncStorage.multiGet(keys);
 
             // Migrate old format (minutes) to new format (total seconds)
             const migrateToSeconds = (value, defaultVal) => {
@@ -78,6 +81,7 @@ const ClockScreen = ({ navigation }) => {
             );
             setIsHapticsEnabled(hapticsEnabled[1] ? hapticsEnabled[1] === 'true' : DEFAULT_HAPTICS_ENABLED);
             setIsStopOnTimeEnd(stopOnTimeEnd[1] ? stopOnTimeEnd[1] === 'true' : DEFAULT_STOP_ON_TIME_END);
+            setIsAudioAlertEnabled(audioAlertEnabled[1] ? audioAlertEnabled[1] === 'true' : DEFAULT_AUDIO_ALERT_ENABLED);
 
             // Reset the timer UIs
             setClockTopRunning(false);
@@ -187,6 +191,17 @@ const ClockScreen = ({ navigation }) => {
         }
     };
 
+    const audioPlayer = useAudioPlayer(require('../../assets/audio/game-over-alert.mp3'));
+
+    const playTimeUpSound = () => {
+        try {
+            audioPlayer.seekTo(0);
+            audioPlayer.play();
+        } catch (error) {
+            console.log('Error playing sound:', error);
+        }
+    };
+
     const resetGame = () => {
         setClockTopRunning(false);
         setClockBottomRunning(false);
@@ -278,6 +293,7 @@ const ClockScreen = ({ navigation }) => {
                             until={gameTime}
                             onFinish={() => {
                                 setTopTimeEnded(true);
+                                if (isAudioAlertEnabled) playTimeUpSound();
                                 if (isStopOnTimeEnd) {
                                     setClockTopRunning(false);
                                     setClockBottomRunning(false);
@@ -337,6 +353,7 @@ const ClockScreen = ({ navigation }) => {
                             until={gameTime}
                             onFinish={() => {
                                 setBottomTimeEnded(true);
+                                if (isAudioAlertEnabled) playTimeUpSound();
                                 if (isStopOnTimeEnd) {
                                     setClockTopRunning(false);
                                     setClockBottomRunning(false);

@@ -23,6 +23,7 @@ import {
     DEFAULT_OPPOSITE_DIRECTION,
     DEFAULT_HAPTICS_ENABLED,
     DEFAULT_STOP_ON_TIME_END,
+    DEFAULT_AUDIO_ALERT_ENABLED,
 } from '../../constants';
 import { toBool } from '../../utils';
 
@@ -37,6 +38,7 @@ const SettingsScreen = () => {
     const [isOppositeDirectionCards, setIsOppositeDirectionCards] = useState(true);
     const [isHapticsEnabled, setIsHapticsEnabled] = useState(true);
     const [isStopOnTimeEnd, setIsStopOnTimeEnd] = useState(false);
+    const [isAudioAlertEnabled, setIsAudioAlertEnabled] = useState(false);
 
     useEffect(() => {
         _getSettingsFromStorage();
@@ -51,19 +53,29 @@ const SettingsScreen = () => {
 
     const _getSettingsFromStorage = async () => {
         try {
-            const [time, overtime, penalty, isOppositeDirectionCards, isHapticsEnabled, stopOnTimeEnd] = await Promise.all([
+            const [
+                time,
+                overtime,
+                penalty,
+                isOppositeDirectionCards,
+                isHapticsEnabled,
+                stopOnTimeEnd,
+                audioAlertEnabled,
+            ] = await Promise.all([
                 AsyncStorage.getItem('@time'),
                 AsyncStorage.getItem('@overtime'),
                 AsyncStorage.getItem('@penalty'),
                 AsyncStorage.getItem('@isOppositeDirectionCards'),
                 AsyncStorage.getItem('@isHapticsEnabled'),
                 AsyncStorage.getItem('@stopOnTimeEnd'),
+                AsyncStorage.getItem('@audioAlertEnabled'),
             ]);
 
             isOppositeDirectionCards === null &&
                 _setDefaultsFirstTime('@isOppositeDirectionCards', DEFAULT_OPPOSITE_DIRECTION);
             isHapticsEnabled === null && _setDefaultsFirstTime('@isHapticsEnabled', DEFAULT_HAPTICS_ENABLED);
             stopOnTimeEnd === null && _setDefaultsFirstTime('@stopOnTimeEnd', DEFAULT_STOP_ON_TIME_END);
+            audioAlertEnabled === null && _setDefaultsFirstTime('@audioAlertEnabled', DEFAULT_AUDIO_ALERT_ENABLED);
             penalty === null && _setDefaultsFirstTime('@penalty', DEFAULT_PENALTY);
 
             // Migrate old format (minutes) to new format (total seconds)
@@ -97,6 +109,9 @@ const SettingsScreen = () => {
             );
             setIsHapticsEnabled(isHapticsEnabled === null ? DEFAULT_HAPTICS_ENABLED : toBool(isHapticsEnabled));
             setIsStopOnTimeEnd(stopOnTimeEnd === null ? DEFAULT_STOP_ON_TIME_END : toBool(stopOnTimeEnd));
+            setIsAudioAlertEnabled(
+                audioAlertEnabled === null ? DEFAULT_AUDIO_ALERT_ENABLED : toBool(audioAlertEnabled)
+            );
 
             setLoading(false);
         } catch (error) {
@@ -232,6 +247,20 @@ const SettingsScreen = () => {
         _setStopOnTimeEndSetting(isChecked);
     };
 
+    const _setAudioAlertSetting = async (status) => {
+        try {
+            await AsyncStorage.setItem('@audioAlertEnabled', status.toString());
+            alert('Successfully saved :)');
+        } catch (error) {
+            alert('Could not save setting :(');
+        }
+    };
+
+    const applyAudioAlert = (isChecked) => {
+        setIsAudioAlertEnabled(isChecked);
+        _setAudioAlertSetting(isChecked);
+    };
+
     const showInfo = (title, message) => {
         Alert.alert(title, message);
     };
@@ -305,7 +334,10 @@ const SettingsScreen = () => {
                             </View>
                             <Divider style={styles.divider} />
                         </View>
-                        <View style={isStopOnTimeEnd ? styles.disabledSection : null} pointerEvents={isStopOnTimeEnd ? 'none' : 'auto'}>
+                        <View
+                            style={isStopOnTimeEnd ? styles.disabledSection : null}
+                            pointerEvents={isStopOnTimeEnd ? 'none' : 'auto'}
+                        >
                             <View style={styles.settingContainer}>
                                 <View style={styles.settingTitleRow}>
                                     <Text category="h4" style={styles.settingTitle}>
@@ -356,7 +388,10 @@ const SettingsScreen = () => {
                             </View>
                             <Divider style={styles.divider} />
                         </View>
-                        <View style={isStopOnTimeEnd ? styles.disabledSection : null} pointerEvents={isStopOnTimeEnd ? 'none' : 'auto'}>
+                        <View
+                            style={isStopOnTimeEnd ? styles.disabledSection : null}
+                            pointerEvents={isStopOnTimeEnd ? 'none' : 'auto'}
+                        >
                             <View style={styles.settingContainer}>
                                 <View style={styles.settingTitleRow}>
                                     <Text category="h4" style={styles.settingTitle}>
@@ -396,10 +431,10 @@ const SettingsScreen = () => {
                         <View>
                             <View style={styles.settingContainer}>
                                 <Text category="h4" style={styles.settingTitle}>
-                                    Personalization
+                                    House Rules
                                 </Text>
                                 <Text category="h6" style={styles.settingSubtitle}>
-                                    Customize the UI
+                                    Fun tweaks beyond the standard game.
                                 </Text>
                             </View>
                             <View style={styles.changeSettingContainer}>
@@ -444,6 +479,21 @@ const SettingsScreen = () => {
                                         status="warning"
                                         checked={isStopOnTimeEnd}
                                         onChange={applyStopOnTimeEnd}
+                                    />
+                                </View>
+                            </View>
+                            <View style={styles.changeSettingContainer}>
+                                <View style={styles.changeSettingLeft}>
+                                    <Text category="h5" style={styles.personalizationSettingsText}>
+                                        Audio alert when time is up
+                                    </Text>
+                                </View>
+                                <View style={styles.changeSettingRight}>
+                                    <Toggle
+                                        size="small"
+                                        status="warning"
+                                        checked={isAudioAlertEnabled}
+                                        onChange={applyAudioAlert}
                                     />
                                 </View>
                             </View>

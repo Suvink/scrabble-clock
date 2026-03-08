@@ -94,6 +94,7 @@ export default {
                 },
             ],
             'expo-font',
+            'expo-audio',
         ],
     },
 };

@@ -14,6 +14,7 @@ const DEFAULT_PENALTY = 2;
 const DEFAULT_OPPOSITE_DIRECTION = true;
 const DEFAULT_HAPTICS_ENABLED = true;
 const DEFAULT_STOP_ON_TIME_END = false;
+const DEFAULT_AUDIO_ALERT_ENABLED = false;
 
 const BoolValues = {
     TRUE: 'true',
@@ -30,6 +31,7 @@ export {
     DEFAULT_OPPOSITE_DIRECTION,
     DEFAULT_HAPTICS_ENABLED,
     DEFAULT_STOP_ON_TIME_END,
+    DEFAULT_AUDIO_ALERT_ENABLED,
     BoolValues,
     PLATFORM_IOS,
 };
