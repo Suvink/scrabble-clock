@@ -8,11 +8,12 @@
  */
 
 import React from 'react';
-import { Image, View } from 'react-native';
+import { Image, View, Linking, TouchableOpacity } from 'react-native';
 import * as Device from 'expo-device';
 import { Layout, Text } from '@ui-kitten/components';
 import SOCLogo from '../../assets/Scrabble-o-Clock-long.png';
 import SOCLogoIos from '../../assets/ios/Scrabble-o-Clock-long-ios.png';
+import BMCLogo from '../../assets/bmc-logo.png';
 import styles from './styles';
 import { PLATFORM_IOS } from '../../constants';
 
@@ -28,7 +29,7 @@ const AboutScreen = () => {
                 <Image source={SOCLogo} style={{ width: 300, height: 200 }} />
             )}
             <Text category="h6" style={styles.aboutScreenSubtitleText}>
-                Version: 3.1.0
+                Version: 3.2.0
             </Text>
             <View style={styles.textContainer}>
                 {isIos ? (
@@ -50,6 +51,20 @@ const AboutScreen = () => {
                         hone their skills.
                     </Text>
                 )}
+            </View>
+            <View style={styles.supportContainer}>
+                <Text category="h6" style={styles.supportText}>
+                    This app is free, always has been, always will be. No ads. No subscriptions. No mysterious "premium
+                    tier" that unlocks the letter Q. Just one developer, an unreasonable coffee habit, and a dream. If
+                    this app has ever saved a game night or helped you absolutely destroy your friends at the table, a
+                    coffee would mean the world and will almost certainly be metabolized directly into new features :)
+                </Text>
+                <TouchableOpacity
+                    onPress={() => Linking.openURL('https://buymeacoffee.com/suvink')}
+                    activeOpacity={0.8}
+                >
+                    <Image source={BMCLogo} style={styles.bmcLogo} resizeMode="contain" />
+                </TouchableOpacity>
             </View>
         </Layout>
     );

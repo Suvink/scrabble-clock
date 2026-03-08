@@ -17,12 +17,16 @@ import CountDown from '../../packages/CountdownTimer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import { useAudioPlayer } from 'expo-audio';
 import {
     DEFAULT_TIME,
     DEFAULT_OVERTIME,
     DEFAULT_PENALTY,
     DEFAULT_OPPOSITE_DIRECTION,
     DEFAULT_HAPTICS_ENABLED,
+    DEFAULT_STOP_ON_TIME_END,
+    DEFAULT_AUDIO_ALERT_ENABLED,
 } from '../../constants';
 import { useGameState } from '../../contexts/GameStateContext';
 
@@ -39,12 +43,14 @@ const ClockScreen = ({ navigation }) => {
     const [runningTaskByPause, setRunningTaskByPause] = useState('');
     const [isOppositeDirectionCards, setIsOppositeDirectionCards] = useState(true);
     const [isHapticsEnabled, setIsHapticsEnabled] = useState(true);
+    const [isStopOnTimeEnd, setIsStopOnTimeEnd] = useState(DEFAULT_STOP_ON_TIME_END);
+    const [isAudioAlertEnabled, setIsAudioAlertEnabled] = useState(DEFAULT_AUDIO_ALERT_ENABLED);
     const [parentLayoutStyles, setParentLayoutStyles] = useState({});
 
-    //Game settings
-    const [gameTime, setGameTime] = useState(13);
-    const [gameOvertime, setGameOvertime] = useState(5);
-    const [gamePenalty, setGamePenalty] = useState(2);
+    //Game settings (gameTime and gameOvertime are in seconds)
+    const [gameTime, setGameTime] = useState(DEFAULT_TIME);
+    const [gameOvertime, setGameOvertime] = useState(DEFAULT_OVERTIME);
+    const [gamePenalty, setGamePenalty] = useState(DEFAULT_PENALTY);
 
     //Reset Params
     const [topClockId, setTopClockId] = useState('100');
@@ -58,16 +64,24 @@ const ClockScreen = ({ navigation }) => {
 
     const getSettings = async () => {
         try {
-            const keys = ['@time', '@overtime', '@penalty', '@isOppositeDirectionCards', '@isHapticsEnabled'];
-            const [time, overtime, penalty, oppositeCardDirection, hapticsEnabled] = await AsyncStorage.multiGet(keys);
+            const keys = ['@time', '@overtime', '@penalty', '@isOppositeDirectionCards', '@isHapticsEnabled', '@stopOnTimeEnd', '@audioAlertEnabled'];
+            const [time, overtime, penalty, oppositeCardDirection, hapticsEnabled, stopOnTimeEnd, audioAlertEnabled] = await AsyncStorage.multiGet(keys);
 
-            setGameTime(time[1] ? parseInt(time[1]) : DEFAULT_TIME);
-            setGameOvertime(overtime[1] ? parseInt(overtime[1]) : DEFAULT_OVERTIME);
-            setGamePenalty(penalty[1] ? parseInt(penalty[1]) : DEFAULT_PENALTY);
+            // Migrate old format (minutes) to new format (total seconds)
+            const migrateToSeconds = (value, defaultVal) => {
+                if (!value) return defaultVal;
+                const num = parseInt(value, 10);
+                return num < 60 ? num * 60 : num;
+            };
+            setGameTime(migrateToSeconds(time[1], DEFAULT_TIME));
+            setGameOvertime(migrateToSeconds(overtime[1], DEFAULT_OVERTIME));
+            setGamePenalty(penalty[1] ? parseFloat(penalty[1]) : DEFAULT_PENALTY);
             setIsOppositeDirectionCards(
                 oppositeCardDirection[1] ? oppositeCardDirection[1] === 'true' : DEFAULT_OPPOSITE_DIRECTION
             );
             setIsHapticsEnabled(hapticsEnabled[1] ? hapticsEnabled[1] === 'true' : DEFAULT_HAPTICS_ENABLED);
+            setIsStopOnTimeEnd(stopOnTimeEnd[1] ? stopOnTimeEnd[1] === 'true' : DEFAULT_STOP_ON_TIME_END);
+            setIsAudioAlertEnabled(audioAlertEnabled[1] ? audioAlertEnabled[1] === 'true' : DEFAULT_AUDIO_ALERT_ENABLED);
 
             // Reset the timer UIs
             setClockTopRunning(false);
@@ -177,6 +191,17 @@ const ClockScreen = ({ navigation }) => {
         }
     };
 
+    const audioPlayer = useAudioPlayer(require('../../assets/audio/game-over-alert.mp3'));
+
+    const playTimeUpSound = () => {
+        try {
+            audioPlayer.seekTo(0);
+            audioPlayer.play();
+        } catch (error) {
+            console.log('Error playing sound:', error);
+        }
+    };
+
     const resetGame = () => {
         setClockTopRunning(false);
         setClockBottomRunning(false);
@@ -198,7 +223,7 @@ const ClockScreen = ({ navigation }) => {
             const topSecs = Math.floor(elapsed % 60);
             const _topPenalty = topMins * gamePenalty + (topSecs > 0 ? gamePenalty : 0);
 
-            if (topMins >= gameOvertime) {
+            if (elapsed >= gameOvertime) {
                 setTopPenalty('Disqualified');
             } else {
                 setTopPenalty('Penalty: ' + _topPenalty.toString());
@@ -212,7 +237,7 @@ const ClockScreen = ({ navigation }) => {
             const bottomSecs = Math.floor(elapsed % 60);
             const _bottomPenalty = bottomMins * gamePenalty + (bottomSecs > 0 ? gamePenalty : 0);
 
-            if (bottomMins >= gameOvertime) {
+            if (elapsed >= gameOvertime) {
                 setBottomPenalty('Disqualified');
             } else {
                 setBottomPenalty('Penalty: ' + _bottomPenalty.toString());
@@ -239,6 +264,16 @@ const ClockScreen = ({ navigation }) => {
         setGlobalGameStarted(isGameStarted);
     }, [isGameStarted, setGlobalGameStarted]);
 
+    // Keep screen awake during game
+    useEffect(() => {
+        if (isGameStarted) {
+            activateKeepAwakeAsync();
+        } else {
+            deactivateKeepAwake();
+        }
+        return () => deactivateKeepAwake();
+    }, [isGameStarted]);
+
     return (
         <SafeAreaView style={styles.safeAreaContainer}>
             <Layout style={parentLayoutStyles}>
@@ -253,10 +288,19 @@ const ClockScreen = ({ navigation }) => {
                     ]}
                     onPress={handleTopTap}
                 >
-                    {gameTime && gameOvertime && gamePenalty && (
+                    {gameTime != null && gameOvertime != null && gamePenalty != null && (
                         <CountDown
-                            until={gameTime * 60}
-                            onFinish={() => setTopTimeEnded(true)}
+                            until={gameTime}
+                            onFinish={() => {
+                                setTopTimeEnded(true);
+                                if (isAudioAlertEnabled) playTimeUpSound();
+                                if (isStopOnTimeEnd) {
+                                    setClockTopRunning(false);
+                                    setClockBottomRunning(false);
+                                    setIsGamePaused(true);
+                                    setRunningTaskByPause('top');
+                                }
+                            }}
                             timeToShow={['M', 'S']}
                             size={80}
                             digitStyle={{ backgroundColor: 'transparent' }}
@@ -271,7 +315,7 @@ const ClockScreen = ({ navigation }) => {
                             isGameStarted={isGameStarted}
                         />
                     )}
-                    {topTimeEnded && (
+                    {topTimeEnded && !isStopOnTimeEnd && (
                         <Text category="h2" style={styles.penaltyText}>
                             {topPenalty}
                         </Text>
@@ -304,10 +348,19 @@ const ClockScreen = ({ navigation }) => {
                     }
                     onPress={handleBottomTap}
                 >
-                    {gameTime && gameOvertime && gamePenalty && (
+                    {gameTime != null && gameOvertime != null && gamePenalty != null && (
                         <CountDown
-                            until={gameTime * 60}
-                            onFinish={() => setBottomTimeEnded(true)}
+                            until={gameTime}
+                            onFinish={() => {
+                                setBottomTimeEnded(true);
+                                if (isAudioAlertEnabled) playTimeUpSound();
+                                if (isStopOnTimeEnd) {
+                                    setClockTopRunning(false);
+                                    setClockBottomRunning(false);
+                                    setIsGamePaused(true);
+                                    setRunningTaskByPause('bottom');
+                                }
+                            }}
                             timeToShow={['M', 'S']}
                             size={80}
                             digitStyle={{ backgroundColor: 'transparent' }}
@@ -322,7 +375,7 @@ const ClockScreen = ({ navigation }) => {
                             isGameStarted={isGameStarted}
                         />
                     )}
-                    {bottomTimeEnded && (
+                    {bottomTimeEnded && !isStopOnTimeEnd && (
                         <Text category="h2" style={styles.penaltyText}>
                             {bottomPenalty}
                         </Text>

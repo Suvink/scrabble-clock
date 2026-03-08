@@ -48,7 +48,7 @@ export default {
     expo: {
         name: assets.name,
         slug: assets.slug,
-        version: '3.1.0',
+        version: '3.2.0',
         orientation: 'portrait',
         icon: assets.icon,
         userInterfaceStyle: 'light',
@@ -64,7 +64,7 @@ export default {
             bundleIdentifier: 'com.suvink.scrabbleclock',
         },
         android: {
-            versionCode: 14,
+            versionCode: 15,
             adaptiveIcon: {
                 foregroundImage: assets.adaptiveIcon,
                 backgroundColor: '#ffffff',
@@ -94,6 +94,7 @@ export default {
                 },
             ],
             'expo-font',
+            'expo-audio',
         ],
     },
 };
