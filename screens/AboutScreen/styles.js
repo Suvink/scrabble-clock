@@ -26,6 +26,21 @@ const styles = StyleSheet.create({
         textAlign: 'justify',
         fontWeight: 'normal',
     },
+    supportContainer: {
+        paddingHorizontal: 30,
+        alignItems: 'center',
+    },
+    supportText: {
+        fontSize: 13,
+        color: '#aaa',
+        textAlign: 'justify',
+        fontWeight: 'normal',
+        marginBottom: 15,
+    },
+    bmcLogo: {
+        width: 200,
+        height: 50,
+    },
 });
 
 export default styles;
