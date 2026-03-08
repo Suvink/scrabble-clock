@@ -37,11 +37,11 @@ const styles = StyleSheet.create({
     changeSettingContainer: {
         display: 'flex',
         flexDirection: 'row',
+        alignItems: 'flex-end',
         marginBottom: 20,
     },
     changeSettingLeft: {
         width: '70%',
-        alignSelf: 'center',
     },
     changeSettingRight: {
         width: '30%',
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     },
     settingChangeButton: {
         padding: 0,
-        height: 48,
+        height: 50,
         backgroundColor: '#f9cc0b',
         color: 'black',
         borderColor: '#f9cc0b',
@@ -64,6 +64,41 @@ const styles = StyleSheet.create({
     personalizationSettingsText: {
         color: 'white',
         fontSize: 15,
+    },
+    settingTitleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    infoIconContainer: {
+        marginLeft: 8,
+        padding: 4,
+    },
+    infoIcon: {
+        width: 22,
+        height: 22,
+    },
+    dualInputLabels: {
+        flexDirection: 'row',
+        marginBottom: 4,
+    },
+    dualInputLabel: {
+        flex: 1,
+        color: '#aaa',
+        fontSize: 11,
+    },
+    dualInputRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    dualInput: {
+        flex: 1,
+        height: 50,
+    },
+    inputSeparator: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginHorizontal: 6,
     },
 });
 

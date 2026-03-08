@@ -8,9 +8,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { View, Keyboard, Dimensions } from 'react-native';
+import { View, Keyboard, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Layout, Text, Button, Divider, Input, Toggle } from '@ui-kitten/components';
+import { Ionicons } from '@react-native-vector-icons/ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PTRView from 'react-native-pull-to-refresh';
 import styles from './styles';
@@ -26,9 +27,11 @@ import { toBool } from '../../utils';
 
 const SettingsScreen = () => {
     const { height: screenHeight } = Dimensions.get('window');
-    const [time, setTime] = useState(0);
-    const [overtime, setOvertime] = useState(0);
-    const [penalty, setPenalty] = useState(0);
+    const [timeMinutes, setTimeMinutes] = useState('');
+    const [timeSeconds, setTimeSeconds] = useState('');
+    const [overtimeMinutes, setOvertimeMinutes] = useState('');
+    const [overtimeSeconds, setOvertimeSeconds] = useState('');
+    const [penalty, setPenalty] = useState('');
     const [loading, setLoading] = useState(true);
     const [isOppositeDirectionCards, setIsOppositeDirectionCards] = useState(true);
     const [isHapticsEnabled, setIsHapticsEnabled] = useState(true);
@@ -36,6 +39,13 @@ const SettingsScreen = () => {
     useEffect(() => {
         _getSettingsFromStorage();
     }, []);
+
+    const totalSecondsToMinSec = (totalSeconds) => {
+        const num = parseInt(totalSeconds, 10);
+        const mins = Math.floor(num / 60);
+        const secs = num % 60;
+        return { mins: mins.toString(), secs: secs.toString() };
+    };
 
     const _getSettingsFromStorage = async () => {
         try {
@@ -47,16 +57,37 @@ const SettingsScreen = () => {
                 AsyncStorage.getItem('@isHapticsEnabled'),
             ]);
 
-            time === null && _setDefaultsFirstTime('@time', DEFAULT_TIME);
-            overtime === null && _setDefaultsFirstTime('@overtime', DEFAULT_OVERTIME);
-            penalty === null && _setDefaultsFirstTime('@penalty', DEFAULT_PENALTY);
             isOppositeDirectionCards === null &&
                 _setDefaultsFirstTime('@isOppositeDirectionCards', DEFAULT_OPPOSITE_DIRECTION);
             isHapticsEnabled === null && _setDefaultsFirstTime('@isHapticsEnabled', DEFAULT_HAPTICS_ENABLED);
+            penalty === null && _setDefaultsFirstTime('@penalty', DEFAULT_PENALTY);
 
-            setTime(time || DEFAULT_TIME);
-            setOvertime(overtime || DEFAULT_OVERTIME);
-            setPenalty(penalty || DEFAULT_PENALTY);
+            // Migrate old format (minutes) to new format (total seconds)
+            const migrateToSeconds = (value, key, defaultVal) => {
+                if (value === null) return defaultVal;
+                const num = parseInt(value, 10);
+                if (num < 60) {
+                    const migrated = num * 60;
+                    AsyncStorage.setItem(key, migrated.toString());
+                    return migrated;
+                }
+                return num;
+            };
+
+            const timeVal = migrateToSeconds(time, '@time', DEFAULT_TIME);
+            const overtimeVal = migrateToSeconds(overtime, '@overtime', DEFAULT_OVERTIME);
+            const penaltyVal = penalty || DEFAULT_PENALTY.toString();
+
+            const timeParts = totalSecondsToMinSec(timeVal.toString());
+            setTimeMinutes(timeParts.mins);
+            setTimeSeconds(timeParts.secs);
+
+            const overtimeParts = totalSecondsToMinSec(overtimeVal.toString());
+            setOvertimeMinutes(overtimeParts.mins);
+            setOvertimeSeconds(overtimeParts.secs);
+
+            setPenalty(penaltyVal);
+
             setIsOppositeDirectionCards(
                 isOppositeDirectionCards === null ? DEFAULT_OPPOSITE_DIRECTION : toBool(isOppositeDirectionCards)
             );
@@ -79,10 +110,47 @@ const SettingsScreen = () => {
         }
     };
 
+    const validateMinutesSeconds = (minutes, seconds, label) => {
+        const mins = Number(minutes);
+        const secs = Number(seconds);
+
+        if (isNaN(mins) || !Number.isInteger(mins)) {
+            alert(`Please enter a valid whole number for ${label} minutes`);
+            return false;
+        }
+        if (isNaN(secs) || !Number.isInteger(secs)) {
+            alert(`Please enter a valid whole number for ${label} seconds`);
+            return false;
+        }
+        if (mins < 1) {
+            alert(`${label} minutes must be at least 1`);
+            return false;
+        }
+        if (secs < 0 || secs > 59) {
+            alert(`${label} seconds must be between 0 and 59`);
+            return false;
+        }
+        return true;
+    };
+
+    const validatePenalty = (value) => {
+        const num = Number(value);
+        if (isNaN(num)) {
+            alert('Please enter a valid number for penalty');
+            return false;
+        }
+        if (num < 0) {
+            alert('Penalty cannot be negative');
+            return false;
+        }
+        return true;
+    };
+
     const _setGameTime = async () => {
-        if (validateTime(time)) {
+        if (validateMinutesSeconds(timeMinutes, timeSeconds, 'Game time')) {
+            const totalSeconds = Number(timeMinutes) * 60 + Number(timeSeconds);
             try {
-                await AsyncStorage.setItem('@time', time.toString());
+                await AsyncStorage.setItem('@time', totalSeconds.toString());
                 alert('Successfully saved :)');
             } catch (error) {
                 alert('Could not save game time :(');
@@ -91,9 +159,10 @@ const SettingsScreen = () => {
     };
 
     const _setOverTimeLimit = async () => {
-        if (validateTime(overtime)) {
+        if (validateMinutesSeconds(overtimeMinutes, overtimeSeconds, 'Overtime')) {
+            const totalSeconds = Number(overtimeMinutes) * 60 + Number(overtimeSeconds);
             try {
-                await AsyncStorage.setItem('@overtime', overtime.toString());
+                await AsyncStorage.setItem('@overtime', totalSeconds.toString());
                 alert('Successfully saved :)');
             } catch (error) {
                 alert('Could not save overtime limit :(');
@@ -102,7 +171,7 @@ const SettingsScreen = () => {
     };
 
     const _setPenaltyTime = async () => {
-        if (validateTime(penalty)) {
+        if (validatePenalty(penalty)) {
             try {
                 await AsyncStorage.setItem('@penalty', penalty.toString());
                 alert('Successfully saved :)');
@@ -141,23 +210,15 @@ const SettingsScreen = () => {
         _setHapticsSettings(isChecked);
     };
 
-    const validateTime = (time) => {
-        const parsedTime = Number(time);
-        if (!isNaN(parsedTime) && Number.isInteger(parsedTime)) {
-            return true;
-        }
-        alert('⚠️ Please enter a valid time');
+    const showInfo = (title, message) => {
+        Alert.alert(title, message);
     };
 
-    const getParentLayoutStyles = () => {
-        // Adjust the screen size when a safe area is present
-        const screenStyles = {
-            ...styles.pageContainer,
-            minHeight: (parentScreenHeight / screenHeight) * 100 + '%',
-            height: (parentScreenHeight / screenHeight) * 100 + '%',
-        };
-        return screenStyles;
-    };
+    const renderInfoIcon = (onPress) => (
+        <TouchableOpacity onPress={onPress} style={styles.infoIconContainer}>
+            <Ionicons name="information-circle-outline" size={22} color="#f9cc0b" />
+        </TouchableOpacity>
+    );
 
     return (
         <PTRView
@@ -173,23 +234,46 @@ const SettingsScreen = () => {
                         </Text>
                         <View>
                             <View style={styles.settingContainer}>
-                                <Text category="h4" style={styles.settingTitle}>
-                                    Time
-                                </Text>
+                                <View style={styles.settingTitleRow}>
+                                    <Text category="h4" style={styles.settingTitle}>
+                                        Time
+                                    </Text>
+                                    {renderInfoIcon(() =>
+                                        showInfo(
+                                            'Game Time',
+                                            'Enter the time each player has at the beginning.\n\nMinutes: Must be at least 1 (whole numbers only).\nSeconds: Must be between 0 and 59 (whole numbers only).'
+                                        )
+                                    )}
+                                </View>
                                 <Text category="h6" style={styles.settingSubtitle}>
                                     The number of minutes each player has at the beginning
                                 </Text>
                             </View>
                             <View style={styles.changeSettingContainer}>
                                 <View style={styles.changeSettingLeft} keyboardShouldPersistTaps="always">
-                                    <Input
-                                        size="large"
-                                        keyboardType="numeric"
-                                        placeholder="Time in minutes"
-                                        defaultValue={time.toString()}
-                                        style={styles.settingChangeInput}
-                                        onChangeText={(nextValue) => setTime(nextValue)}
-                                    />
+                                    <View style={styles.dualInputLabels}>
+                                        <Text style={styles.dualInputLabel}>Minutes</Text>
+                                        <Text style={styles.dualInputLabel}>Seconds</Text>
+                                    </View>
+                                    <View style={styles.dualInputRow}>
+                                        <Input
+                                            size="large"
+                                            keyboardType="numeric"
+                                            placeholder="Min"
+                                            value={timeMinutes}
+                                            style={styles.dualInput}
+                                            onChangeText={(val) => setTimeMinutes(val)}
+                                        />
+                                        <Text style={styles.inputSeparator}>:</Text>
+                                        <Input
+                                            size="large"
+                                            keyboardType="numeric"
+                                            placeholder="Sec"
+                                            value={timeSeconds}
+                                            style={styles.dualInput}
+                                            onChangeText={(val) => setTimeSeconds(val)}
+                                        />
+                                    </View>
                                 </View>
                                 <View style={styles.changeSettingRight}>
                                     <Button size="small" style={styles.settingChangeButton} onPress={_setGameTime}>
@@ -201,23 +285,46 @@ const SettingsScreen = () => {
                         </View>
                         <View>
                             <View style={styles.settingContainer}>
-                                <Text category="h4" style={styles.settingTitle}>
-                                    Overtime Limit
-                                </Text>
+                                <View style={styles.settingTitleRow}>
+                                    <Text category="h4" style={styles.settingTitle}>
+                                        Overtime Limit
+                                    </Text>
+                                    {renderInfoIcon(() =>
+                                        showInfo(
+                                            'Overtime Limit',
+                                            'Enter the maximum overtime before disqualification.\n\nMinutes: Must be at least 1 (whole numbers only).\nSeconds: Must be between 0 and 59 (whole numbers only).'
+                                        )
+                                    )}
+                                </View>
                                 <Text category="h6" style={styles.settingSubtitle}>
                                     The maximum number of minutes of overtime before disqualification
                                 </Text>
                             </View>
                             <View style={styles.changeSettingContainer}>
                                 <View style={styles.changeSettingLeft}>
-                                    <Input
-                                        size="large"
-                                        keyboardType="numeric"
-                                        placeholder="Time in minutes"
-                                        defaultValue={overtime.toString()}
-                                        style={styles.settingChangeInput}
-                                        onChangeText={(nextValue) => setOvertime(nextValue)}
-                                    />
+                                    <View style={styles.dualInputLabels}>
+                                        <Text style={styles.dualInputLabel}>Minutes</Text>
+                                        <Text style={styles.dualInputLabel}>Seconds</Text>
+                                    </View>
+                                    <View style={styles.dualInputRow}>
+                                        <Input
+                                            size="large"
+                                            keyboardType="numeric"
+                                            placeholder="Min"
+                                            value={overtimeMinutes}
+                                            style={styles.dualInput}
+                                            onChangeText={(val) => setOvertimeMinutes(val)}
+                                        />
+                                        <Text style={styles.inputSeparator}>:</Text>
+                                        <Input
+                                            size="large"
+                                            keyboardType="numeric"
+                                            placeholder="Sec"
+                                            value={overtimeSeconds}
+                                            style={styles.dualInput}
+                                            onChangeText={(val) => setOvertimeSeconds(val)}
+                                        />
+                                    </View>
                                 </View>
                                 <View style={styles.changeSettingRight}>
                                     <Button size="small" style={styles.settingChangeButton} onPress={_setOverTimeLimit}>
@@ -229,9 +336,17 @@ const SettingsScreen = () => {
                         </View>
                         <View>
                             <View style={styles.settingContainer}>
-                                <Text category="h4" style={styles.settingTitle}>
-                                    Penalty
-                                </Text>
+                                <View style={styles.settingTitleRow}>
+                                    <Text category="h4" style={styles.settingTitle}>
+                                        Penalty
+                                    </Text>
+                                    {renderInfoIcon(() =>
+                                        showInfo(
+                                            'Penalty',
+                                            'Enter the point deduction per started minute of overtime.\n\nMust be 0 or a positive number. Decimal values are accepted (e.g. 1.5). Negative values are not allowed.'
+                                        )
+                                    )}
+                                </View>
                                 <Text category="h6" style={styles.settingSubtitle}>
                                     Point reduction per started minute of overtime
                                 </Text>
@@ -241,8 +356,8 @@ const SettingsScreen = () => {
                                     <Input
                                         size="large"
                                         placeholder="Penalty per minute"
-                                        keyboardType="numeric"
-                                        defaultValue={penalty.toString()}
+                                        keyboardType="decimal-pad"
+                                        value={penalty}
                                         style={styles.settingChangeInput}
                                         onChangeText={(nextValue) => setPenalty(nextValue)}
                                     />

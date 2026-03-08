@@ -41,10 +41,10 @@ const ClockScreen = ({ navigation }) => {
     const [isHapticsEnabled, setIsHapticsEnabled] = useState(true);
     const [parentLayoutStyles, setParentLayoutStyles] = useState({});
 
-    //Game settings
-    const [gameTime, setGameTime] = useState(13);
-    const [gameOvertime, setGameOvertime] = useState(5);
-    const [gamePenalty, setGamePenalty] = useState(2);
+    //Game settings (gameTime and gameOvertime are in seconds)
+    const [gameTime, setGameTime] = useState(DEFAULT_TIME);
+    const [gameOvertime, setGameOvertime] = useState(DEFAULT_OVERTIME);
+    const [gamePenalty, setGamePenalty] = useState(DEFAULT_PENALTY);
 
     //Reset Params
     const [topClockId, setTopClockId] = useState('100');
@@ -61,9 +61,15 @@ const ClockScreen = ({ navigation }) => {
             const keys = ['@time', '@overtime', '@penalty', '@isOppositeDirectionCards', '@isHapticsEnabled'];
             const [time, overtime, penalty, oppositeCardDirection, hapticsEnabled] = await AsyncStorage.multiGet(keys);
 
-            setGameTime(time[1] ? parseInt(time[1]) : DEFAULT_TIME);
-            setGameOvertime(overtime[1] ? parseInt(overtime[1]) : DEFAULT_OVERTIME);
-            setGamePenalty(penalty[1] ? parseInt(penalty[1]) : DEFAULT_PENALTY);
+            // Migrate old format (minutes) to new format (total seconds)
+            const migrateToSeconds = (value, defaultVal) => {
+                if (!value) return defaultVal;
+                const num = parseInt(value, 10);
+                return num < 60 ? num * 60 : num;
+            };
+            setGameTime(migrateToSeconds(time[1], DEFAULT_TIME));
+            setGameOvertime(migrateToSeconds(overtime[1], DEFAULT_OVERTIME));
+            setGamePenalty(penalty[1] ? parseFloat(penalty[1]) : DEFAULT_PENALTY);
             setIsOppositeDirectionCards(
                 oppositeCardDirection[1] ? oppositeCardDirection[1] === 'true' : DEFAULT_OPPOSITE_DIRECTION
             );
@@ -198,7 +204,7 @@ const ClockScreen = ({ navigation }) => {
             const topSecs = Math.floor(elapsed % 60);
             const _topPenalty = topMins * gamePenalty + (topSecs > 0 ? gamePenalty : 0);
 
-            if (topMins >= gameOvertime) {
+            if (elapsed >= gameOvertime) {
                 setTopPenalty('Disqualified');
             } else {
                 setTopPenalty('Penalty: ' + _topPenalty.toString());
@@ -212,7 +218,7 @@ const ClockScreen = ({ navigation }) => {
             const bottomSecs = Math.floor(elapsed % 60);
             const _bottomPenalty = bottomMins * gamePenalty + (bottomSecs > 0 ? gamePenalty : 0);
 
-            if (bottomMins >= gameOvertime) {
+            if (elapsed >= gameOvertime) {
                 setBottomPenalty('Disqualified');
             } else {
                 setBottomPenalty('Penalty: ' + _bottomPenalty.toString());
@@ -253,9 +259,9 @@ const ClockScreen = ({ navigation }) => {
                     ]}
                     onPress={handleTopTap}
                 >
-                    {gameTime && gameOvertime && gamePenalty && (
+                    {gameTime != null && gameOvertime != null && gamePenalty != null && (
                         <CountDown
-                            until={gameTime * 60}
+                            until={gameTime}
                             onFinish={() => setTopTimeEnded(true)}
                             timeToShow={['M', 'S']}
                             size={80}
@@ -304,9 +310,9 @@ const ClockScreen = ({ navigation }) => {
                     }
                     onPress={handleBottomTap}
                 >
-                    {gameTime && gameOvertime && gamePenalty && (
+                    {gameTime != null && gameOvertime != null && gamePenalty != null && (
                         <CountDown
-                            until={gameTime * 60}
+                            until={gameTime}
                             onFinish={() => setBottomTimeEnded(true)}
                             timeToShow={['M', 'S']}
                             size={80}
