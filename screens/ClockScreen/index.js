@@ -17,6 +17,7 @@ import CountDown from '../../packages/CountdownTimer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
+import { KeepAwake } from 'expo-keep-awake';
 import {
     DEFAULT_TIME,
     DEFAULT_OVERTIME,
@@ -336,6 +337,7 @@ const ClockScreen = ({ navigation }) => {
                 </Pressable>
             </Layout>
             <StatusBar hidden={true} backgroundColor="#000000" style="dark" />
+            {isGameStarted && <KeepAwake />}
             <Modal visible={resetModalVisible} backdropStyle={styles.backdrop}>
                 <Card disabled={true} style={styles.modalCard}>
                     <Text category="h6">Are you sure you want to stop and reset the timer?</Text>
